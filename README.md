@@ -8,9 +8,6 @@ http://www.hyuki.com/yukiwiki/mini/ykwkmini.cgi
 
 # DESCRIPTION
 
-YukiWikiMini is a yet another Wiki clone.
-
-Wiki is a simple CGI program that enables readers to add/delete/modify pages.
 YukiWikiMini is a smallest subset of Wiki.
 
 # COPYRIGHT
