@@ -13,6 +13,7 @@
 #
 ##############################
 use strict;
+use warnings;
 use CGI;
 my $dbname = 'ykwkmini';
 my $frontpage = 'FrontPage';
@@ -50,7 +51,7 @@ exit(0);
 sub main {
     &sanitize_form;
 
-    if ($q->Vars->{keywords} =~ /^($WikiName)$/) {
+    if (defined $q->Vars->{keywords} && $q->Vars->{keywords} =~ /^($WikiName)$/) {
         $q->Vars->{mycmd} = 'read';
         $q->Vars->{mypage} = $1;
     }
@@ -59,7 +60,10 @@ sub main {
         &print_error("(dbmopen)");
     }
     $_ = $q->Vars->{mycmd};
-    if (/^read$/) {
+    if (! $_) {
+        $q->Vars->{mypage} = $frontpage;
+        &do_read;
+    } elsif (/^read$/) {
         &do_read;
     } elsif (/^write$/) {
         &do_write;
@@ -83,6 +87,7 @@ sub do_read {
 sub do_edit {
     &print_header($q->param("mypage"), 0);
     my $mymsg = &escape($database{$q->param("mypage")});
+    $mymsg = "" unless defined $mymsg;
     my $mypage = $q->param("mypage");
 
     print <<"EOD";
