@@ -2,7 +2,9 @@
 use strict;
 use warnings;
 use CGI;
+
 our $VERSION = "1.1.1";
+
 my $dbname = 'ykwkmini';
 my $frontpage = 'FrontPage';
 my $indexpage = 'Index';
@@ -26,11 +28,11 @@ a:hover { text-decoration: underline }
 -->
 </style>
 EOD
-##############################
+
 my %form;
 my %database;
-
 my $q = CGI->new;
+
 &main;
 exit(0);
 
