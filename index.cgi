@@ -162,14 +162,15 @@ sub print_footer {
 }
 
 sub escape {
-    my $s = shift;
-    $s =~ s|\r\n|\n|g;
-    $s =~ s|\r|\n|g;
-    $s =~ s|\&|&amp;|g;
-    $s =~ s|<|&lt;|g;
-    $s =~ s|>|&gt;|g;
-    $s =~ s|"|&quot;|g;
-    return $s;
+    local $_ = shift;
+    return unless $_;
+    s|\r\n|\n|g;
+    s|\r|\n|g;
+    s|\&|&amp;|g;
+    s|<|&lt;|g;
+    s|>|&gt;|g;
+    s|"|&quot;|g;
+    return $_;
 }
 
 sub print_content {
