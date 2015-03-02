@@ -2,7 +2,7 @@
 #
 # YukiWikiMini Version 1.0.2
 #
-# ykwkmini.cgi - Yet another WikiWikiWeb clone.
+# Yet another WikiWikiWeb clone.
 #
 # Copyright (C) 2000,2001,2003,2004 by Hiroshi Yuki.
 # <hyuki@hyuki.com>
@@ -14,7 +14,7 @@
 ##############################
 use strict;
 my $dbname = 'ykwkmini';
-my $thisurl = 'ykwkmini.cgi';
+my $thisurl = '';
 my $frontpage = 'FrontPage';
 my $indexpage = 'Index';
 my $errorpage = 'Error';
