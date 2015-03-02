@@ -33,11 +33,10 @@ my %form;
 my %database;
 my $q = CGI->new;
 
-&main;
-exit(0);
+main();
 
 sub main {
-    &sanitize_form;
+    sanitize_form();
 
     if (defined $q->Vars->{keywords} && $q->Vars->{keywords} =~ /^($WikiName)$/) {
         $q->Vars->{mycmd} = 'read';
@@ -45,36 +44,36 @@ sub main {
     }
 
     unless (dbmopen(%database, $dbname, 0666)) {
-        &print_error("(dbmopen)");
+        print_error("(dbmopen)");
     }
     $_ = $q->Vars->{mycmd};
     if (! $_) {
         $q->Vars->{mypage} = $frontpage;
-        &do_read;
+        do_read();
     } elsif (/^read$/) {
-        &do_read;
+        do_read();
     } elsif (/^write$/) {
-        &do_write;
+        do_write();
     } elsif (/^edit$/) {
-        &do_edit;
+        do_edit();
     } elsif (/^index$/) {
-        &do_index;
+        do_index();
     } else {
         $q->Vars->{mypage} = $frontpage;
-        &do_read;
+        do_read();
     }
     dbmclose(%database);
 }
 
 sub do_read {
-    &print_header($q->param("mypage"), 1);
-    &print_content;
-    &print_footer;
+    print_header($q->param("mypage"), 1);
+    print_content();
+    print_footer();
 }
 
 sub do_edit {
-    &print_header($q->param("mypage"), 0);
-    my $mymsg = &escape($database{$q->param("mypage")});
+    print_header($q->param("mypage"), 0);
+    my $mymsg = escape($database{$q->param("mypage")});
     $mymsg = "" unless defined $mymsg;
     my $mypage = $q->param("mypage");
 
@@ -87,36 +86,36 @@ sub do_edit {
         <input type="submit" value="$naviwrite">
     </form>
 EOD
-    &print_footer;
+    print_footer();
 }
 
 sub do_index {
-    &print_header($indexpage, 0);
+    print_header($indexpage, 0);
     print qq|<ul>\n|;
     foreach (sort keys %database) {
         print qq|<li><a href="?$_"><tt>$_</tt></a></li>\n|
     }
     print qq|</ul>\n|;
-    &print_footer;
+    print_footer();
 }
 
 sub do_write {
     if ($q->Vars->{mymsg}) {
         $database{$q->param("mypage")} = $q->Vars->{mymsg};
-        &print_header($q->param("mypage"), 1);
-        &print_content;
+        print_header($q->param("mypage"), 1);
+        print_content();
     } else {
         delete $database{$q->param("mypage")};
-        &print_header($q->param("mypage") . $msgdeleted, 0);
+        print_header($q->param("mypage") . $msgdeleted, 0);
     }
-    &print_footer;
+    print_footer();
 }
 
 sub print_error {
     my $msg = shift;
-    &print_header($errorpage, 0);
+    print_header($errorpage, 0);
     print "<h1>$msg</h1>";
-    &print_footer;
+    print_footer();
     exit(0);
 }
 
@@ -162,7 +161,7 @@ sub escape {
 }
 
 sub print_content {
-    $_ = &escape($database{$q->param("mypage")});
+    $_ = escape($database{$q->param("mypage")});
     s!
         (
             ((mailto|http|https|ftp):[\x21-\x7E]*)  # Direct http://...
@@ -170,7 +169,7 @@ sub print_content {
             ($WikiName)                             # LocalLinkLikeThis
         )
     !
-        &make_link($1)
+        make_link($1)
     !gex;
     print "<pre>", $_, "</pre>";
 }
@@ -190,6 +189,6 @@ sub make_link {
 
 sub sanitize_form {
     if (defined($q->param("mypage")) and $q->param("mypage") !~ /^$WikiName$/) {
-        &print_error("(invalid mypage)");
+        print_error("(invalid mypage)");
     }
 }
