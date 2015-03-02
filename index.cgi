@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
 #
-# YukiWikiMini Version 1.1.0
-#
 # Yet another WikiWikiWeb clone.
 #
 # Copyright (C) 2000,2001,2003,2004 by Hiroshi Yuki.
@@ -15,6 +13,7 @@
 use strict;
 use warnings;
 use CGI;
+our $VERSION = "1.1.0";
 my $dbname = 'ykwkmini';
 my $frontpage = 'FrontPage';
 my $indexpage = 'Index';
