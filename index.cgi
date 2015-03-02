@@ -18,7 +18,6 @@ my $frontpage = 'FrontPage';
 my $indexpage = 'Index';
 my $errorpage = 'Error';
 my $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
-my $kanjicode = 'sjis';
 my $editchar = '?';
 my $bgcolor = 'white';
 my $contenttype = 'Content-type: text/html; charset=utf-8';
