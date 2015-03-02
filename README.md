@@ -21,10 +21,6 @@ modify it under the same terms as Perl itself.
 
 # SEE ALSO
 
-http://c2.com/cgi/wikibase?WikiWikiWeb
-
-the original Wiki site
-
 http://www.hyuki.com/yukiwiki/
 
 the original YukiWikiMini
