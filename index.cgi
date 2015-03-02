@@ -1,29 +1,17 @@
 #!/usr/bin/env perl
-#
-# YukiWikiMini Version 1.1.0
-#
-# Yet another WikiWikiWeb clone.
-#
-# Copyright (C) 2000,2001,2003,2004 by Hiroshi Yuki.
-# <hyuki@hyuki.com>
-# http://www.hyuki.com/yukiwiki/
-#
-# This program is free software; you can redistribute it and/or
-# modify it under the same terms as Perl itself.
-#
-##############################
 use strict;
 use warnings;
 use CGI;
+
+our $VERSION = "1.1.1";
+
 my $dbname = 'ykwkmini';
 my $frontpage = 'FrontPage';
 my $indexpage = 'Index';
 my $errorpage = 'Error';
 my $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
-my $kanjicode = 'sjis';
 my $editchar = '?';
 my $bgcolor = 'white';
-my $contenttype = 'Content-type: text/html; charset=utf-8';
 my $naviwrite = 'Write';
 my $naviedit = 'Edit';
 my $naviindex = 'Index';
@@ -40,16 +28,15 @@ a:hover { text-decoration: underline }
 -->
 </style>
 EOD
-##############################
+
 my %form;
 my %database;
-
 my $q = CGI->new;
-&main;
-exit(0);
+
+main();
 
 sub main {
-    &sanitize_form;
+    sanitize_form();
 
     if (defined $q->Vars->{keywords} && $q->Vars->{keywords} =~ /^($WikiName)$/) {
         $q->Vars->{mycmd} = 'read';
@@ -57,36 +44,36 @@ sub main {
     }
 
     unless (dbmopen(%database, $dbname, 0666)) {
-        &print_error("(dbmopen)");
+        print_error("(dbmopen)");
     }
     $_ = $q->Vars->{mycmd};
     if (! $_) {
         $q->Vars->{mypage} = $frontpage;
-        &do_read;
+        do_read();
     } elsif (/^read$/) {
-        &do_read;
+        do_read();
     } elsif (/^write$/) {
-        &do_write;
+        do_write();
     } elsif (/^edit$/) {
-        &do_edit;
+        do_edit();
     } elsif (/^index$/) {
-        &do_index;
+        do_index();
     } else {
         $q->Vars->{mypage} = $frontpage;
-        &do_read;
+        do_read();
     }
     dbmclose(%database);
 }
 
 sub do_read {
-    &print_header($q->param("mypage"), 1);
-    &print_content;
-    &print_footer;
+    print_header($q->param("mypage"), 1);
+    print_content();
+    print_footer();
 }
 
 sub do_edit {
-    &print_header($q->param("mypage"), 0);
-    my $mymsg = &escape($database{$q->param("mypage")});
+    print_header($q->param("mypage"), 0);
+    my $mymsg = escape($database{$q->param("mypage")});
     $mymsg = "" unless defined $mymsg;
     my $mypage = $q->param("mypage");
 
@@ -99,36 +86,36 @@ sub do_edit {
         <input type="submit" value="$naviwrite">
     </form>
 EOD
-    &print_footer;
+    print_footer();
 }
 
 sub do_index {
-    &print_header($indexpage, 0);
+    print_header($indexpage, 0);
     print qq|<ul>\n|;
     foreach (sort keys %database) {
         print qq|<li><a href="?$_"><tt>$_</tt></a></li>\n|
     }
     print qq|</ul>\n|;
-    &print_footer;
+    print_footer();
 }
 
 sub do_write {
     if ($q->Vars->{mymsg}) {
         $database{$q->param("mypage")} = $q->Vars->{mymsg};
-        &print_header($q->param("mypage"), 1);
-        &print_content;
+        print_header($q->param("mypage"), 1);
+        print_content();
     } else {
         delete $database{$q->param("mypage")};
-        &print_header($q->param("mypage") . $msgdeleted, 0);
+        print_header($q->param("mypage") . $msgdeleted, 0);
     }
-    &print_footer;
+    print_footer();
 }
 
 sub print_error {
     my $msg = shift;
-    &print_header($errorpage, 0);
+    print_header($errorpage, 0);
     print "<h1>$msg</h1>";
-    &print_footer;
+    print_footer();
     exit(0);
 }
 
@@ -136,10 +123,15 @@ sub print_header {
     my ($title, $canedit) = @_;
     my $mypage = $q->param("mypage");
     print <<"EOD";
-$contenttype
+Content-type: text/html; charset=utf-8
 
+<!DOCTYPE html>
 <html>
-    <head><title>$title</title>$style</head>
+    <head>
+    <meta charset="utf-8">
+    <title>$title</title>
+    $style
+    </head>
     <body bgcolor="$bgcolor">
         <table width="100%" border="0">
             <tr valign="top">
@@ -174,7 +166,7 @@ sub escape {
 }
 
 sub print_content {
-    $_ = &escape($database{$q->param("mypage")});
+    $_ = escape($database{$q->param("mypage")});
     s!
         (
             ((mailto|http|https|ftp):[\x21-\x7E]*)  # Direct http://...
@@ -182,7 +174,7 @@ sub print_content {
             ($WikiName)                             # LocalLinkLikeThis
         )
     !
-        &make_link($1)
+        make_link($1)
     !gex;
     print "<pre>", $_, "</pre>";
 }
@@ -202,6 +194,6 @@ sub make_link {
 
 sub sanitize_form {
     if (defined($q->param("mypage")) and $q->param("mypage") !~ /^$WikiName$/) {
-        &print_error("(invalid mypage)");
+        print_error("(invalid mypage)");
     }
 }
