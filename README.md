@@ -2,10 +2,6 @@
 
 YukiWikiMini - Yet Another Wiki Clone.
 
-# SYNOPSIS
-
-http://www.hyuki.com/yukiwiki/mini/ykwkmini.cgi
-
 # DESCRIPTION
 
 YukiWikiMini is a smallest subset of Wiki.
