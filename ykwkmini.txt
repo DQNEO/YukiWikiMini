@@ -1,0 +1,24 @@
+NAME
+    YukiWikiMini - Yet Another Wiki Clone.
+
+SYNOPSIS
+    http://www.hyuki.com/yukiwiki/ykwkmini.cgi
+
+DESCRIPTION
+    YukiWikiMini is a yet another Wiki clone.
+    Wiki is a simple CGI program that enables readers
+    to add/delete/modify pages.
+    YukiWikiMini is a smallest subset of Wiki.
+
+COPYRIGHT
+    Copyright 2000,2001 by Hiroshi Yuki <hyuki@hyuki.com>.
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+SEE ALSO
+    http://c2.com/cgi/wikibase?WikiWikiWeb
+        the original Wiki site
+    http://www.hyuki.com/yukiwiki/ykwkmini.html
+        latest YukiWikiMini
+    http://www.hyuki.com/yukiwiki/ykwkmini.cgi
+        YukiWikiMini site
