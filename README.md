@@ -23,5 +23,4 @@ modify it under the same terms as Perl itself.
 
 http://www.hyuki.com/yukiwiki/
 
-the original YukiWikiMini
-
+the original Wiki 'YukiWiki'
