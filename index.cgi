@@ -12,7 +12,7 @@
 use strict;
 use warnings;
 use CGI;
-our $VERSION = "1.1.0";
+our $VERSION = "1.1.1";
 my $dbname = 'ykwkmini';
 my $frontpage = 'FrontPage';
 my $indexpage = 'Index';
