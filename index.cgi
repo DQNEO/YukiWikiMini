@@ -14,7 +14,6 @@
 ##############################
 use strict;
 my $dbname = 'ykwkmini';
-my $thisurl = '';
 my $frontpage = 'FrontPage';
 my $indexpage = 'Index';
 my $errorpage = 'Error';
@@ -86,7 +85,7 @@ sub do_edit {
     &print_header($form{mypage}, 0);
     my $mymsg = &escape($database{$form{mypage}});
     print <<"EOD";
-    <form action="$thisurl" method="post">
+    <form action="." method="post">
         <input type="hidden" name="mycmd" value="write">
         <input type="hidden" name="mypage" value="$form{mypage}">
         <input type="submit" value="$naviwrite"><br />
@@ -101,7 +100,7 @@ sub do_index {
     &print_header($indexpage, 0);
     print qq|<ul>\n|;
     foreach (sort keys %database) {
-        print qq|<li><a href="$thisurl?$_"><tt>$_</tt></a></li>\n|
+        print qq|<li><a href="?$_"><tt>$_</tt></a></li>\n|
     }
     print qq|</ul>\n|;
     &print_footer;
@@ -141,9 +140,9 @@ $contenttype
                     <h1>$title</h1>
                 </td>
                 <td align="right">
-                    <a href="$thisurl?$frontpage">$frontpage</a> | 
-                    @{[$canedit ? qq(<a href="$thisurl?mycmd=edit&mypage=$form{mypage}">$naviedit</a> | ) : '' ]}
-                    <a href="$thisurl?mycmd=index">$naviindex</a> | 
+                    <a href="?$frontpage">$frontpage</a> | 
+                    @{[$canedit ? qq(<a href="?mycmd=edit&mypage=$form{mypage}">$naviedit</a> | ) : '' ]}
+                    <a href="?mycmd=index">$naviindex</a> | 
                     <a href="http://www.hyuki.com/yukiwiki/mini/">YukiWikiMini</a>
                 </td>
             </tr>
@@ -187,9 +186,9 @@ sub make_link {
     } elsif (/^(mailto):(.*)/) {
         return qq|<a href="$_">$2</a>|;
     } elsif ($database{$_}) {
-        return qq|<a href="$thisurl?$_">$_</a>|;
+        return qq|<a href="?$_">$_</a>|;
     } else {
-        return qq|$_<a href="$thisurl?mycmd=edit&mypage=$_">$editchar</a>|;
+        return qq|$_<a href="?mycmd=edit&mypage=$_">$editchar</a>|;
     }
 }
 
