@@ -12,7 +12,7 @@ Originally created by hyuki, modified by DQNQEO
 
 Copyright 2000,2001,2003,2004 by Hiroshi Yuki <hyuki@hyuki.com>,
 
-http://www.hyuki.com/yukiwiki/
+http://www.hyuki.com
 
 Copyright 2015 DQNEO
 
