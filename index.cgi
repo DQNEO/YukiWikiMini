@@ -20,7 +20,6 @@ my $errorpage = 'Error';
 my $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
 my $editchar = '?';
 my $bgcolor = 'white';
-my $contenttype = 'Content-type: text/html; charset=utf-8';
 my $naviwrite = 'Write';
 my $naviedit = 'Edit';
 my $naviindex = 'Index';
@@ -133,7 +132,7 @@ sub print_header {
     my ($title, $canedit) = @_;
     my $mypage = $q->param("mypage");
     print <<"EOD";
-$contenttype
+Content-type: text/html; charset=utf-8
 
 <html>
     <head><title>$title</title>$style</head>
