@@ -13,8 +13,9 @@
 #
 ##############################
 use strict;
+use warnings;
+use CGI;
 my $dbname = 'ykwkmini';
-my $thisurl = '';
 my $frontpage = 'FrontPage';
 my $indexpage = 'Index';
 my $errorpage = 'Error';
@@ -22,7 +23,7 @@ my $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
 my $kanjicode = 'sjis';
 my $editchar = '?';
 my $bgcolor = 'white';
-my $contenttype = 'Content-type: text/html; charset=Shift_JIS';
+my $contenttype = 'Content-type: text/html; charset=utf-8';
 my $naviwrite = 'Write';
 my $naviedit = 'Edit';
 my $naviindex = 'Index';
@@ -43,25 +44,26 @@ EOD
 my %form;
 my %database;
 
-require 'jcode.pl';
+my $q = CGI->new;
 &main;
 exit(0);
 
 sub main {
-    &init_form;
     &sanitize_form;
-    foreach (keys %form) {
-        if (/^($WikiName)$/) {
-            $form{mycmd} = 'read';
-            $form{mypage} = $1;
-            last;
-        }
+
+    if (defined $q->Vars->{keywords} && $q->Vars->{keywords} =~ /^($WikiName)$/) {
+        $q->Vars->{mycmd} = 'read';
+        $q->Vars->{mypage} = $1;
     }
+
     unless (dbmopen(%database, $dbname, 0666)) {
         &print_error("(dbmopen)");
     }
-    $_ = $form{mycmd};
-    if (/^read$/) {
+    $_ = $q->Vars->{mycmd};
+    if (! $_) {
+        $q->Vars->{mypage} = $frontpage;
+        &do_read;
+    } elsif (/^read$/) {
         &do_read;
     } elsif (/^write$/) {
         &do_write;
@@ -70,25 +72,28 @@ sub main {
     } elsif (/^index$/) {
         &do_index;
     } else {
-        $form{mypage} = $frontpage;
+        $q->Vars->{mypage} = $frontpage;
         &do_read;
     }
     dbmclose(%database);
 }
 
 sub do_read {
-    &print_header($form{mypage}, 1);
+    &print_header($q->param("mypage"), 1);
     &print_content;
     &print_footer;
 }
 
 sub do_edit {
-    &print_header($form{mypage}, 0);
-    my $mymsg = &escape($database{$form{mypage}});
+    &print_header($q->param("mypage"), 0);
+    my $mymsg = &escape($database{$q->param("mypage")});
+    $mymsg = "" unless defined $mymsg;
+    my $mypage = $q->param("mypage");
+
     print <<"EOD";
-    <form action="$thisurl" method="post">
+    <form action="." method="post">
         <input type="hidden" name="mycmd" value="write">
-        <input type="hidden" name="mypage" value="$form{mypage}">
+        <input type="hidden" name="mypage" value="$mypage">
         <input type="submit" value="$naviwrite"><br />
         <textarea cols="$cols" rows="$rows" name="mymsg" wrap="off">$mymsg</textarea><br />
         <input type="submit" value="$naviwrite">
@@ -101,20 +106,20 @@ sub do_index {
     &print_header($indexpage, 0);
     print qq|<ul>\n|;
     foreach (sort keys %database) {
-        print qq|<li><a href="$thisurl?$_"><tt>$_</tt></a></li>\n|
+        print qq|<li><a href="?$_"><tt>$_</tt></a></li>\n|
     }
     print qq|</ul>\n|;
     &print_footer;
 }
 
 sub do_write {
-    if ($form{mymsg}) {
-        $database{$form{mypage}} = $form{mymsg};
-        &print_header($form{mypage}, 1);
+    if ($q->Vars->{mymsg}) {
+        $database{$q->param("mypage")} = $q->Vars->{mymsg};
+        &print_header($q->param("mypage"), 1);
         &print_content;
     } else {
-        delete $database{$form{mypage}};
-        &print_header($form{mypage} . $msgdeleted, 0);
+        delete $database{$q->param("mypage")};
+        &print_header($q->param("mypage") . $msgdeleted, 0);
     }
     &print_footer;
 }
@@ -129,6 +134,7 @@ sub print_error {
 
 sub print_header {
     my ($title, $canedit) = @_;
+    my $mypage = $q->param("mypage");
     print <<"EOD";
 $contenttype
 
@@ -141,9 +147,9 @@ $contenttype
                     <h1>$title</h1>
                 </td>
                 <td align="right">
-                    <a href="$thisurl?$frontpage">$frontpage</a> | 
-                    @{[$canedit ? qq(<a href="$thisurl?mycmd=edit&mypage=$form{mypage}">$naviedit</a> | ) : '' ]}
-                    <a href="$thisurl?mycmd=index">$naviindex</a> | 
+                    <a href="?$frontpage">$frontpage</a> | 
+                    @{[$canedit ? qq(<a href="?mycmd=edit&mypage=$mypage">$naviedit</a> | ) : '' ]}
+                    <a href="?mycmd=index">$naviindex</a> | 
                     <a href="http://www.hyuki.com/yukiwiki/mini/">YukiWikiMini</a>
                 </td>
             </tr>
@@ -156,18 +162,19 @@ sub print_footer {
 }
 
 sub escape {
-    my $s = shift;
-    $s =~ s|\r\n|\n|g;
-    $s =~ s|\r|\n|g;
-    $s =~ s|\&|&amp;|g;
-    $s =~ s|<|&lt;|g;
-    $s =~ s|>|&gt;|g;
-    $s =~ s|"|&quot;|g;
-    return $s;
+    local $_ = shift;
+    return unless $_;
+    s|\r\n|\n|g;
+    s|\r|\n|g;
+    s|\&|&amp;|g;
+    s|<|&lt;|g;
+    s|>|&gt;|g;
+    s|"|&quot;|g;
+    return $_;
 }
 
 sub print_content {
-    $_ = &escape($database{$form{mypage}});
+    $_ = &escape($database{$q->param("mypage")});
     s!
         (
             ((mailto|http|https|ftp):[\x21-\x7E]*)  # Direct http://...
@@ -187,31 +194,14 @@ sub make_link {
     } elsif (/^(mailto):(.*)/) {
         return qq|<a href="$_">$2</a>|;
     } elsif ($database{$_}) {
-        return qq|<a href="$thisurl?$_">$_</a>|;
+        return qq|<a href="?$_">$_</a>|;
     } else {
-        return qq|$_<a href="$thisurl?mycmd=edit&mypage=$_">$editchar</a>|;
-    }
-}
-
-sub init_form {
-    my ($query);
-    if ($ENV{REQUEST_METHOD} =~ /^post$/i) {
-        read(STDIN, $query, $ENV{CONTENT_LENGTH});
-    } else {
-        $query = $ENV{'QUERY_STRING'};
-    }
-    my @assocarray = split(/&/, $query);
-    foreach (@assocarray) {
-        my ($property, $value) = split /=/;
-        $value =~ tr/+/ /;
-        $value =~ s/%([A-Fa-f0-9][A-Fa-f0-9])/pack("C", hex($1))/eg;
-        &jcode'convert(\$value, $kanjicode);
-        $form{$property} = $value;
+        return qq|$_<a href="?mycmd=edit&mypage=$_">$editchar</a>|;
     }
 }
 
 sub sanitize_form {
-    if (defined($form{mypage}) and $form{mypage} !~ /^$WikiName$/) {
+    if (defined($q->param("mypage")) and $q->param("mypage") !~ /^$WikiName$/) {
         &print_error("(invalid mypage)");
     }
 }
