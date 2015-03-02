@@ -11,7 +11,7 @@ DESCRIPTION
     YukiWikiMini is a smallest subset of Wiki.
 
 COPYRIGHT
-    Copyright 2000,2001,2003 by Hiroshi Yuki <hyuki@hyuki.com>.
+    Copyright 2000,2001,2003,2004 by Hiroshi Yuki <hyuki@hyuki.com>.
     This program is free software; you can redistribute it and/or
     modify it under the same terms as Perl itself.
 
@@ -24,5 +24,6 @@ SEE ALSO
         YukiWikiMini site
 
 CHANGELOG
+    2004-02-26 - Version 1.0.2. Fix bad URL.
     2003-12-14 - Move website.
     2003-03-31 - Version 1.0.1. Add &sanitize_form.

@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 #
-# YukiWikiMini Version 1.0.1
+# YukiWikiMini Version 1.0.2
 #
 # ykwkmini.cgi - Yet another WikiWikiWeb clone.
 #
-# Copyright (C) 2000,2001,2003 by Hiroshi Yuki.
+# Copyright (C) 2000,2001,2003,2004 by Hiroshi Yuki.
 # <hyuki@hyuki.com>
 # http://www.hyuki.com/yukiwiki/
 #
@@ -144,7 +144,7 @@ $contenttype
                     <a href="$thisurl?$frontpage">$frontpage</a> | 
                     @{[$canedit ? qq(<a href="$thisurl?mycmd=edit&mypage=$form{mypage}">$naviedit</a> | ) : '' ]}
                     <a href="$thisurl?mycmd=index">$naviindex</a> | 
-                    <a href="http://www.hyuki.com/yukiwiki/mini/ykwkmini.html">YukiWikiMini</a>
+                    <a href="http://www.hyuki.com/yukiwiki/mini/">YukiWikiMini</a>
                 </td>
             </tr>
         </table>
