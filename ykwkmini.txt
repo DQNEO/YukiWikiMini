@@ -2,7 +2,7 @@ NAME
     YukiWikiMini - Yet Another Wiki Clone.
 
 SYNOPSIS
-    http://www.hyuki.com/yukiwiki/ykwkmini.cgi
+    http://www.hyuki.com/yukiwiki/mini/ykwkmini.cgi
 
 DESCRIPTION
     YukiWikiMini is a yet another Wiki clone.
@@ -11,14 +11,18 @@ DESCRIPTION
     YukiWikiMini is a smallest subset of Wiki.
 
 COPYRIGHT
-    Copyright 2000,2001 by Hiroshi Yuki <hyuki@hyuki.com>.
+    Copyright 2000,2001,2003 by Hiroshi Yuki <hyuki@hyuki.com>.
     This program is free software; you can redistribute it and/or
     modify it under the same terms as Perl itself.
 
 SEE ALSO
     http://c2.com/cgi/wikibase?WikiWikiWeb
         the original Wiki site
-    http://www.hyuki.com/yukiwiki/ykwkmini.html
+    http://www.hyuki.com/yukiwiki/mini/ykwkmini.html
         latest YukiWikiMini
-    http://www.hyuki.com/yukiwiki/ykwkmini.cgi
+    http://www.hyuki.com/yukiwiki/mini/ykwkmini.cgi
         YukiWikiMini site
+
+CHANGELOG
+    2003-12-14 - Move website.
+    2003-03-31 - Version 1.0.1. Add &sanitize_form.

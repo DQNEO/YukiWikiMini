@@ -1,17 +1,15 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl
 #
-# YukiWikiMini Version 1.0.0
+# YukiWikiMini Version 1.0.1
 #
 # ykwkmini.cgi - Yet another WikiWikiWeb clone.
 #
-# Copyright (C) 2000,2001 by Hiroshi Yuki.
+# Copyright (C) 2000,2001,2003 by Hiroshi Yuki.
 # <hyuki@hyuki.com>
 # http://www.hyuki.com/yukiwiki/
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
-#
-# $Id: ykwkmini.cgi 1.5 2001/02/21 15:25:40 yuki Exp $
 #
 ##############################
 use strict;
@@ -23,7 +21,6 @@ my $errorpage = 'Error';
 my $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
 my $kanjicode = 'sjis';
 my $editchar = '?';
-my $titlecolor = '#FFFFCC';
 my $bgcolor = 'white';
 my $contenttype = 'Content-type: text/html; charset=Shift_JIS';
 my $naviwrite = 'Write';
@@ -35,7 +32,8 @@ my $rows = 20;
 my $style = <<'EOD';
 <style type="text/css">
 <!--
-pre { line-height:130% }
+body { font-family: "Courier New", monospace; }
+pre { line-height:130%; }
 a { text-decoration: none }
 a:hover { text-decoration: underline }
 -->
@@ -51,6 +49,7 @@ exit(0);
 
 sub main {
     &init_form;
+    &sanitize_form;
     foreach (keys %form) {
         if (/^($WikiName)$/) {
             $form{mycmd} = 'read';
@@ -91,7 +90,7 @@ sub do_edit {
         <input type="hidden" name="mycmd" value="write">
         <input type="hidden" name="mypage" value="$form{mypage}">
         <input type="submit" value="$naviwrite"><br />
-        <textarea cols="$cols" rows="$rows" name="mymsg" wrap="virtual">$mymsg</textarea><br />
+        <textarea cols="$cols" rows="$rows" name="mymsg" wrap="off">$mymsg</textarea><br />
         <input type="submit" value="$naviwrite">
     </form>
 EOD
@@ -136,15 +135,17 @@ $contenttype
 <html>
     <head><title>$title</title>$style</head>
     <body bgcolor="$bgcolor">
-        <table width="100%" bgcolor="$titlecolor" border="0">
+        <table width="100%" border="0">
             <tr valign="top">
-                <td><b><tt>$title</tt></b></td>
-                <td align="right"><tt>
+                <td>
+                    <h1>$title</h1>
+                </td>
+                <td align="right">
                     <a href="$thisurl?$frontpage">$frontpage</a> | 
-                    @{[$canedit ? qq#<a href="$thisurl?mycmd=edit&mypage=$form{mypage}">$naviedit</a> | # : '' ]}
+                    @{[$canedit ? qq(<a href="$thisurl?mycmd=edit&mypage=$form{mypage}">$naviedit</a> | ) : '' ]}
                     <a href="$thisurl?mycmd=index">$naviindex</a> | 
-                    <a href="http://www.hyuki.com/yukiwiki/">YukiWikiMini</a>
-                </tt></td>
+                    <a href="http://www.hyuki.com/yukiwiki/mini/ykwkmini.html">YukiWikiMini</a>
+                </td>
             </tr>
         </table>
 EOD
@@ -156,6 +157,8 @@ sub print_footer {
 
 sub escape {
     my $s = shift;
+    $s =~ s|\r\n|\n|g;
+    $s =~ s|\r|\n|g;
     $s =~ s|\&|&amp;|g;
     $s =~ s|<|&lt;|g;
     $s =~ s|>|&gt;|g;
@@ -204,5 +207,11 @@ sub init_form {
         $value =~ s/%([A-Fa-f0-9][A-Fa-f0-9])/pack("C", hex($1))/eg;
         &jcode'convert(\$value, $kanjicode);
         $form{$property} = $value;
+    }
+}
+
+sub sanitize_form {
+    if (defined($form{mypage}) and $form{mypage} !~ /^$WikiName$/) {
+        &print_error("(invalid mypage)");
     }
 }
