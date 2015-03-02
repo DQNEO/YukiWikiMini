@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 #
-# YukiWikiMini Version 1.0.3
+# YukiWikiMini Version 1.1.0
 #
 # Yet another WikiWikiWeb clone.
 #
