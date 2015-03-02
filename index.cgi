@@ -125,8 +125,13 @@ sub print_header {
     print <<"EOD";
 Content-type: text/html; charset=utf-8
 
+<!DOCTYPE html>
 <html>
-    <head><title>$title</title>$style</head>
+    <head>
+    <meta charset="utf-8">
+    <title>$title</title>
+    $style
+    </head>
     <body bgcolor="$bgcolor">
         <table width="100%" border="0">
             <tr valign="top">
