@@ -22,7 +22,7 @@ my $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
 my $kanjicode = 'sjis';
 my $editchar = '?';
 my $bgcolor = 'white';
-my $contenttype = 'Content-type: text/html; charset=Shift_JIS';
+my $contenttype = 'Content-type: text/html; charset=utf-8';
 my $naviwrite = 'Write';
 my $naviedit = 'Edit';
 my $naviindex = 'Index';
