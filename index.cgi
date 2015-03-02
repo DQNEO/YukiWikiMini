@@ -13,6 +13,7 @@
 #
 ##############################
 use strict;
+use CGI;
 my $dbname = 'ykwkmini';
 my $frontpage = 'FrontPage';
 my $indexpage = 'Index';
@@ -42,24 +43,22 @@ EOD
 my %form;
 my %database;
 
-require 'jcode.pl';
+my $q = CGI->new;
 &main;
 exit(0);
 
 sub main {
-    &init_form;
     &sanitize_form;
-    foreach (keys %form) {
-        if (/^($WikiName)$/) {
-            $form{mycmd} = 'read';
-            $form{mypage} = $1;
-            last;
-        }
+
+    if ($q->Vars->{keywords} =~ /^($WikiName)$/) {
+        $q->Vars->{mycmd} = 'read';
+        $q->Vars->{mypage} = $1;
     }
+
     unless (dbmopen(%database, $dbname, 0666)) {
         &print_error("(dbmopen)");
     }
-    $_ = $form{mycmd};
+    $_ = $q->Vars->{mycmd};
     if (/^read$/) {
         &do_read;
     } elsif (/^write$/) {
@@ -69,25 +68,27 @@ sub main {
     } elsif (/^index$/) {
         &do_index;
     } else {
-        $form{mypage} = $frontpage;
+        $q->Vars->{mypage} = $frontpage;
         &do_read;
     }
     dbmclose(%database);
 }
 
 sub do_read {
-    &print_header($form{mypage}, 1);
+    &print_header($q->param("mypage"), 1);
     &print_content;
     &print_footer;
 }
 
 sub do_edit {
-    &print_header($form{mypage}, 0);
-    my $mymsg = &escape($database{$form{mypage}});
+    &print_header($q->param("mypage"), 0);
+    my $mymsg = &escape($database{$q->param("mypage")});
+    my $mypage = $q->param("mypage");
+
     print <<"EOD";
     <form action="." method="post">
         <input type="hidden" name="mycmd" value="write">
-        <input type="hidden" name="mypage" value="$form{mypage}">
+        <input type="hidden" name="mypage" value="$mypage">
         <input type="submit" value="$naviwrite"><br />
         <textarea cols="$cols" rows="$rows" name="mymsg" wrap="off">$mymsg</textarea><br />
         <input type="submit" value="$naviwrite">
@@ -107,13 +108,13 @@ sub do_index {
 }
 
 sub do_write {
-    if ($form{mymsg}) {
-        $database{$form{mypage}} = $form{mymsg};
-        &print_header($form{mypage}, 1);
+    if ($q->Vars->{mymsg}) {
+        $database{$q->param("mypage")} = $q->Vars->{mymsg};
+        &print_header($q->param("mypage"), 1);
         &print_content;
     } else {
-        delete $database{$form{mypage}};
-        &print_header($form{mypage} . $msgdeleted, 0);
+        delete $database{$q->param("mypage")};
+        &print_header($q->param("mypage") . $msgdeleted, 0);
     }
     &print_footer;
 }
@@ -128,6 +129,7 @@ sub print_error {
 
 sub print_header {
     my ($title, $canedit) = @_;
+    my $mypage = $q->param("mypage");
     print <<"EOD";
 $contenttype
 
@@ -141,7 +143,7 @@ $contenttype
                 </td>
                 <td align="right">
                     <a href="?$frontpage">$frontpage</a> | 
-                    @{[$canedit ? qq(<a href="?mycmd=edit&mypage=$form{mypage}">$naviedit</a> | ) : '' ]}
+                    @{[$canedit ? qq(<a href="?mycmd=edit&mypage=$mypage">$naviedit</a> | ) : '' ]}
                     <a href="?mycmd=index">$naviindex</a> | 
                     <a href="http://www.hyuki.com/yukiwiki/mini/">YukiWikiMini</a>
                 </td>
@@ -166,7 +168,7 @@ sub escape {
 }
 
 sub print_content {
-    $_ = &escape($database{$form{mypage}});
+    $_ = &escape($database{$q->param("mypage")});
     s!
         (
             ((mailto|http|https|ftp):[\x21-\x7E]*)  # Direct http://...
@@ -192,25 +194,8 @@ sub make_link {
     }
 }
 
-sub init_form {
-    my ($query);
-    if ($ENV{REQUEST_METHOD} =~ /^post$/i) {
-        read(STDIN, $query, $ENV{CONTENT_LENGTH});
-    } else {
-        $query = $ENV{'QUERY_STRING'};
-    }
-    my @assocarray = split(/&/, $query);
-    foreach (@assocarray) {
-        my ($property, $value) = split /=/;
-        $value =~ tr/+/ /;
-        $value =~ s/%([A-Fa-f0-9][A-Fa-f0-9])/pack("C", hex($1))/eg;
-        &jcode'convert(\$value, $kanjicode);
-        $form{$property} = $value;
-    }
-}
-
 sub sanitize_form {
-    if (defined($form{mypage}) and $form{mypage} !~ /^$WikiName$/) {
+    if (defined($q->param("mypage")) and $q->param("mypage") !~ /^$WikiName$/) {
         &print_error("(invalid mypage)");
     }
 }
