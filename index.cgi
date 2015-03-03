@@ -21,11 +21,12 @@ my %form;
 my %database;
 my $q = CGI->new;
 
-my $html = main();
+my $html = main($q);
 print $html;
 
 
 sub main {
+    my $q = shift;
     if (! sanitize_form()) {
         return render_error("(invalid mypage)");
     }
