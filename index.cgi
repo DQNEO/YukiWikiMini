@@ -21,7 +21,9 @@ my %form;
 my %database;
 my $q = CGI->new;
 
-print main();
+my $html = main();
+print $html;
+
 
 sub main {
     if (! sanitize_form()) {
