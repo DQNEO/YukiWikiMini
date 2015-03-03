@@ -24,7 +24,8 @@ my $q = CGI->new;
 my $psgi_ret = main($q);
 my ($status,$headers,$html) = @$psgi_ret;
 
-print $headers->[0];
+print $headers->[0], "\n";
+print "\n";
 print $html;
 
 
@@ -33,7 +34,7 @@ sub main {
     my $html;
 
     my $status;
-    my $headers = ["Content-type: text/html; charset=utf-8\n\n"];
+    my $headers = ["Content-type: text/html; charset=utf-8"];
     if (! sanitize_form()) {
         $html = render_error("(invalid mypage)");
         $status = 200;
