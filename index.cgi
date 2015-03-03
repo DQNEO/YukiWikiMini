@@ -60,8 +60,7 @@ my $app = sub {
     return [$status,$headers, $body];
 };
 
-my $q = CGI->new;
-handle_psgi($app, $q);
+handle_psgi($app, CGI->new);
 
 sub handle_psgi {
     my ($app, $q) = @_;
@@ -156,11 +155,11 @@ sub do_error {
 }
 
 sub render_header {
-    my ($title, $canedit) = @_;
+    my ($mypage, $canedit) = @_;
     my $params = {
-        title => $title,
+        title => $mypage,
         frontpage => $frontpage,
-        mypage => $q->param("mypage") || "",
+        mypage => $mypage  || "",
         naviedit => $naviedit,
         naviindex => $naviindex,
         canedit => $canedit,
