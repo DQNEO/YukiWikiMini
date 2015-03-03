@@ -30,7 +30,7 @@ sub handle_psgi_ret {
     my ($status,$headers,$body) = @_;
     print $headers->[0], ":" , $headers->[1] , "\n";
     print "\n";
-    print $body;
+    print $body->[0];
 }
 
 sub main {
@@ -42,7 +42,7 @@ sub main {
     if (! sanitize_form()) {
         $body = render_error("(invalid mypage)");
         $status = 200;
-        return [$status,$headers, $body];
+        return [$status,$headers, [$body]];
     }
 
     if (defined $env->Vars->{keywords} && $env->Vars->{keywords} =~ /^($WikiName)$/) {
@@ -53,7 +53,7 @@ sub main {
     unless (dbmopen(%database, $dbname, 0666)) {
         $body =  render_error("(dbmopen)");
         $status = 200;
-        return [$status,$headers, $body];
+        return [$status,$headers, [$body]];
     }
 
     $_ = $env->Vars->{mycmd};
@@ -74,7 +74,7 @@ sub main {
     }
     dbmclose(%database);
     $status = 200;
-    return [$status,$headers, $body];
+    return [$status,$headers, [$body]];
 }
 
 sub do_read {
