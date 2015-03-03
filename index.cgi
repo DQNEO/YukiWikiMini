@@ -116,9 +116,9 @@ sub do_index {
 
     return [
         render_header($indexpage, 0),
-        qq|<ul>\n|,
+        "<ul>\n",
         @li,
-        qq|</ul>\n|,
+        "</ul>\n",
         render_footer()
         ];
 }
