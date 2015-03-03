@@ -131,13 +131,15 @@ sub do_write {
         $database{$q->param("mypage")} = $q->Vars->{mymsg};
         $html .= render_header($q->param("mypage"), 1);
         $html .= render_content();
+        $html .= render_footer();
+        return $html;
     } else {
         delete $database{$q->param("mypage")};
         $html .= render_header($q->param("mypage") . $msgdeleted, 0);
+        $html .= render_footer();
+        return $html;
     }
 
-    $html .= render_footer();
-    return $html;
 }
 
 sub render_error {
