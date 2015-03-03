@@ -27,22 +27,22 @@ my ($status,$headers,$html) = @$psgi_ret;
 handle_psgi_ret($status, $headers, $html);
 
 sub handle_psgi_ret {
-    my ($status,$headers,$html) = @_;
+    my ($status,$headers,$body) = @_;
     print $headers->[0], ":" , $headers->[1] , "\n";
     print "\n";
-    print $html;
+    print $body;
 }
 
 sub main {
     my $env = shift;
-    my $html;
+    my $body;
 
     my $status;
     my $headers = ["Content-type" => "text/html; charset=utf-8"];
     if (! sanitize_form()) {
-        $html = render_error("(invalid mypage)");
+        $body = render_error("(invalid mypage)");
         $status = 200;
-        return [$status,$headers, $html];
+        return [$status,$headers, $body];
     }
 
     if (defined $env->Vars->{keywords} && $env->Vars->{keywords} =~ /^($WikiName)$/) {
@@ -51,30 +51,30 @@ sub main {
     }
 
     unless (dbmopen(%database, $dbname, 0666)) {
-        $html =  render_error("(dbmopen)");
+        $body =  render_error("(dbmopen)");
         $status = 200;
-        return [$status,$headers, $html];
+        return [$status,$headers, $body];
     }
 
     $_ = $env->Vars->{mycmd};
     if (! $_) {
         $env->Vars->{mypage} = $frontpage;
-        $html = do_read();
+        $body = do_read();
     } elsif (/^read$/) {
-        $html = do_read();
+        $body = do_read();
     } elsif (/^write$/) {
-        $html = do_write();
+        $body = do_write();
     } elsif (/^edit$/) {
-        $html = do_edit();
+        $body = do_edit();
     } elsif (/^index$/) {
-        $html = do_index();
+        $body = do_index();
     } else {
         $env->Vars->{mypage} = $frontpage;
-        $html = do_read();
+        $body = do_read();
     }
     dbmclose(%database);
     $status = 200;
-    return [$status,$headers, $html];
+    return [$status,$headers, $body];
 }
 
 sub do_read {
