@@ -73,7 +73,7 @@ sub handle_psgi {
     my ($status,$headers,$body) = @{$app->($q)};
     print $headers->[0], ":" , $headers->[1] , "\n";
     print "\n";
-    print $body->[0];
+    print $_ for @$body;
 }
 
 sub do_read {
