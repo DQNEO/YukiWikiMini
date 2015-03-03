@@ -26,14 +26,14 @@ print $html;
 
 
 sub main {
-    my $q = shift;
+    my $env = shift;
     if (! sanitize_form()) {
         return render_error("(invalid mypage)");
     }
 
-    if (defined $q->Vars->{keywords} && $q->Vars->{keywords} =~ /^($WikiName)$/) {
-        $q->Vars->{mycmd} = 'read';
-        $q->Vars->{mypage} = $1;
+    if (defined $env->Vars->{keywords} && $env->Vars->{keywords} =~ /^($WikiName)$/) {
+        $env->Vars->{mycmd} = 'read';
+        $env->Vars->{mypage} = $1;
     }
 
     my $html;
@@ -41,9 +41,9 @@ sub main {
         return render_error("(dbmopen)");
     }
 
-    $_ = $q->Vars->{mycmd};
+    $_ = $env->Vars->{mycmd};
     if (! $_) {
-        $q->Vars->{mypage} = $frontpage;
+        $env->Vars->{mypage} = $frontpage;
         $html = do_read();
     } elsif (/^read$/) {
         $html = do_read();
@@ -54,7 +54,7 @@ sub main {
     } elsif (/^index$/) {
         $html = do_index();
     } else {
-        $q->Vars->{mypage} = $frontpage;
+        $env->Vars->{mypage} = $frontpage;
         $html = do_read();
     }
     dbmclose(%database);
