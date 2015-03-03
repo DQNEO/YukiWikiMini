@@ -22,7 +22,7 @@ my %database;
 my $q = CGI->new;
 
 my $psgi_ret = main($q);
-my ($status,undef,$html) = @$psgi_ret;
+my ($status,$headers,$html) = @$psgi_ret;
 
 print $html;
 
