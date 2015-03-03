@@ -129,8 +129,8 @@ sub do_write {
     my $q = shift;
     my $db = shift;
     my $mypage = shift;
-    if ($q->Vars->{mymsg}) {
-        $db->{$mypage} = $q->Vars->{mymsg};
+    if ($q->param("mymsg")) {
+        $db->{$mypage} = $q->param("mymsg");
         return [
             render_header($mypage, 1),
             render_content($db, $mypage),
