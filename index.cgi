@@ -15,8 +15,8 @@ my $msgdeleted = ' is deleted.';
 my $cols = 80;
 my $rows = 20;
 
-my %database;
-my $db = \%database;
+my $db = {};
+
 my $app = sub {
     my $env = my $q = shift;
     my $body;
