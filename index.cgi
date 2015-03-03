@@ -23,13 +23,6 @@ my $q = CGI->new;
 
 handle_psgi_ret(@{main($q)});
 
-sub handle_psgi_ret {
-    my ($status,$headers,$body) = @_;
-    print $headers->[0], ":" , $headers->[1] , "\n";
-    print "\n";
-    print $body->[0];
-}
-
 sub main {
     my $env = shift;
     my $html;
@@ -72,6 +65,13 @@ sub main {
     dbmclose(%database);
     $status = 200;
     return [$status,$headers, [$html]];
+}
+
+sub handle_psgi_ret {
+    my ($status,$headers,$body) = @_;
+    print $headers->[0], ":" , $headers->[1] , "\n";
+    print "\n";
+    print $body->[0];
 }
 
 sub do_read {
