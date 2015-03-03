@@ -22,7 +22,7 @@ my %form;
 my %database;
 my $q = CGI->new;
 
-main();
+print main();
 
 sub main {
     sanitize_form();
@@ -32,27 +32,29 @@ sub main {
         $q->Vars->{mypage} = $1;
     }
 
+    my $html;
     unless (dbmopen(%database, $dbname, 0666)) {
-        print render_error("(dbmopen)");
-        exit(0);
+        return render_error("(dbmopen)");
     }
+
     $_ = $q->Vars->{mycmd};
     if (! $_) {
         $q->Vars->{mypage} = $frontpage;
-        print do_read();
+        $html = do_read();
     } elsif (/^read$/) {
-        print do_read();
+        $html = do_read();
     } elsif (/^write$/) {
-        print do_write();
+        $html = do_write();
     } elsif (/^edit$/) {
-        print do_edit();
+        $html = do_edit();
     } elsif (/^index$/) {
-        print do_index();
+        $html = do_index();
     } else {
         $q->Vars->{mypage} = $frontpage;
-        print do_read();
+        $html = do_read();
     }
     dbmclose(%database);
+    return $html;
 }
 
 sub do_read {
