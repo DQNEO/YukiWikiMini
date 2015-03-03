@@ -16,7 +16,6 @@ my $msgdeleted = ' is deleted.';
 my $cols = 80;
 my $rows = 20;
 
-my %form;
 my %database;
 my $app = sub {
     my $env = my $q = shift;
