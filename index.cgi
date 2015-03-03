@@ -65,9 +65,9 @@ my $app = sub {
     return [$status,$headers, [$html]];
 };
 
-handle_psgi_ret($app, $q);
+handle_psgi($app, $q);
 
-sub handle_psgi_ret {
+sub handle_psgi {
     my ($app, $q) = @_;
     my ($status,$headers,$body) = @{$app->($q)};
     print $headers->[0], ":" , $headers->[1] , "\n";
