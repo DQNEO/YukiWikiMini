@@ -111,7 +111,7 @@ sub do_index {
 
     my @li;
     foreach (sort keys %database) {
-        push @li, qq|<li><a href="?$_"><tt>$_</tt></a></li>\n|;
+        push @li, "<li><a href=\"?$_\"><tt>$_</tt></a></li>\n";
     }
 
     return [
