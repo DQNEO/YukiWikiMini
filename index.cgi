@@ -117,7 +117,7 @@ sub do_index {
     }
     $html .= qq|</ul>\n|;
     $html .= render_footer();
-    return $html;
+    return [ $html ];
 }
 
 sub do_write {
