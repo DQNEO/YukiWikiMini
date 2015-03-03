@@ -21,7 +21,7 @@ my %form;
 my %database;
 my $q = CGI->new;
 
-my $main = sub {
+my $app = sub {
     my $env = shift;
     my $html;
 
@@ -65,7 +65,7 @@ my $main = sub {
     return [$status,$headers, [$html]];
 };
 
-handle_psgi_ret(@{$main->($q)});
+handle_psgi_ret(@{$app->($q)});
 
 sub handle_psgi_ret {
     my ($status,$headers,$body) = @_;
