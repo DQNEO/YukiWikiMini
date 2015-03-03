@@ -47,7 +47,7 @@ sub main {
     } elsif (/^edit$/) {
         do_edit();
     } elsif (/^index$/) {
-        do_index();
+        print do_index();
     } else {
         $q->Vars->{mypage} = $frontpage;
         do_read();
@@ -80,13 +80,15 @@ EOD
 }
 
 sub do_index {
-    print render_header($indexpage, 0);
-    print qq|<ul>\n|;
+    my $html = "";
+    $html .= render_header($indexpage, 0);
+    $html .= qq|<ul>\n|;
     foreach (sort keys %database) {
-        print qq|<li><a href="?$_"><tt>$_</tt></a></li>\n|
+        $html .= qq|<li><a href="?$_"><tt>$_</tt></a></li>\n|;
     }
-    print qq|</ul>\n|;
-    print render_footer();
+    $html .= qq|</ul>\n|;
+    $html .= render_footer();
+    return $html;
 }
 
 sub do_write {
