@@ -12,9 +12,6 @@ my $naviwrite = 'Write';
 my $naviedit = 'Edit';
 my $naviindex = 'Index';
 my $msgdeleted = ' is deleted.';
-my $cols = 80;
-my $rows = 20;
-
 
 my $app = sub {
     my $env = my $q = shift;
@@ -96,7 +93,7 @@ sub do_edit {
         <input type="hidden" name="mycmd" value="write">
         <input type="hidden" name="mypage" value="$mypage">
         <input type="submit" value="$naviwrite"><br />
-        <textarea cols="$cols" rows="$rows" name="mymsg" wrap="off">$mymsg</textarea><br />
+        <textarea cols="80" rows="20" name="mymsg" wrap="off">$mymsg</textarea><br />
         <input type="submit" value="$naviwrite">
     </form>
 EOD
