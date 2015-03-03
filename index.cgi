@@ -78,11 +78,11 @@ sub handle_psgi {
 
 sub do_read {
     my $q = shift;
-    my $html = "";
-    $html .= render_header($q->param("mypage"), 1);
-    $html .= render_content();
-    $html .= render_footer();
-    return $html;
+    return [
+        render_header($q->param("mypage"), 1),
+        render_content(),
+        render_footer(),
+        ];
 }
 
 sub do_edit {
