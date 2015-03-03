@@ -5,7 +5,6 @@ use CGI;
 
 our $VERSION = "1.2.1";
 
-my $dbname = 'ykwkmini';
 my $frontpage = 'FrontPage';
 my $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
 my $editchar = '?';
@@ -17,6 +16,7 @@ my $cols = 80;
 my $rows = 20;
 
 my %database;
+my $db = \%database;
 my $app = sub {
     my $env = my $q = shift;
     my $body;
@@ -34,7 +34,7 @@ my $app = sub {
         $env->Vars->{mypage} = $1;
     }
 
-    unless (dbmopen(%database, $dbname, 0666)) {
+    unless (db_open($db)) {
         $status = 200;
         $body =  do_error("(dbmopen)");
         return [$status,$headers, $body];
@@ -56,7 +56,7 @@ my $app = sub {
         $env->Vars->{mypage} = $frontpage;
         $body = do_read($q);
     }
-    dbmclose(%database);
+    db_close($db);
     $status = 200;
 
     return [$status,$headers, $body];
@@ -241,3 +241,13 @@ sub make_link {
     }
 }
 
+sub db_open {
+    my $db = shift;
+    my $dbname = 'ykwkmini';
+    dbmopen(%$db, $dbname, 0666);
+}
+
+sub db_close {
+    my $db = shift;
+    dbmclose(%$db);
+}
