@@ -47,18 +47,18 @@ my $app = sub {
     $_ = $env->Vars->{mycmd};
     if (! $_) {
         $env->Vars->{mypage} = $frontpage;
-        $html = do_read();
+        $html = do_read($q);
     } elsif (/^read$/) {
-        $html = do_read();
+        $html = do_read($q);
     } elsif (/^write$/) {
-        $html = do_write();
+        $html = do_write($q);
     } elsif (/^edit$/) {
-        $html = do_edit();
+        $html = do_edit($q);
     } elsif (/^index$/) {
-        $html = do_index();
+        $html = do_index($q);
     } else {
         $env->Vars->{mypage} = $frontpage;
-        $html = do_read();
+        $html = do_read($q);
     }
     dbmclose(%database);
     $status = 200;
@@ -76,6 +76,7 @@ sub handle_psgi {
 }
 
 sub do_read {
+    my $q = shift;
     my $html = "";
     $html .= render_header($q->param("mypage"), 1);
     $html .= render_content();
@@ -84,6 +85,7 @@ sub do_read {
 }
 
 sub do_edit {
+    my $q = shift;
     my $html = "";
     $html .=  render_header($q->param("mypage"), 0);
     my $mymsg = escape($database{$q->param("mypage")});
@@ -103,6 +105,7 @@ EOD
 }
 
 sub do_index {
+    my $q = shift;
     my $html = "";
     $html .= render_header($indexpage, 0);
     $html .= qq|<ul>\n|;
@@ -115,6 +118,7 @@ sub do_index {
 }
 
 sub do_write {
+    my $q = shift;
 
     my $html = "";
     if ($q->Vars->{mymsg}) {
