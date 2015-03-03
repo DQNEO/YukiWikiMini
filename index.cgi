@@ -27,6 +27,7 @@ print $html;
 
 sub main {
     my $env = shift;
+    my $html;
     if (! sanitize_form()) {
         return render_error("(invalid mypage)");
     }
@@ -36,7 +37,6 @@ sub main {
         $env->Vars->{mypage} = $1;
     }
 
-    my $html;
     unless (dbmopen(%database, $dbname, 0666)) {
         return render_error("(dbmopen)");
     }
