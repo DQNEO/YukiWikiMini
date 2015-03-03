@@ -121,7 +121,14 @@ sub print_error {
 
 sub print_header {
     my ($title, $canedit) = @_;
-    my $mypage = $q->param("mypage");
+    my $params = {
+        title => $title,
+        frontpage => $frontpage,
+        mypage => $q->param("mypage") || "",
+        naviedit => $naviedit,
+        naviindex => $naviindex,
+    };
+
     print <<"EOD";
 Content-type: text/html; charset=utf-8
 
@@ -129,19 +136,19 @@ Content-type: text/html; charset=utf-8
 <html>
     <head>
     <meta charset="utf-8">
-    <title>$title</title>
+    <title>$params->{title}</title>
     $style
     </head>
     <body bgcolor="$bgcolor">
         <table width="100%" border="0">
             <tr valign="top">
                 <td>
-                    <h1>$title</h1>
+                    <h1>$params->{title}</h1>
                 </td>
                 <td align="right">
-                    <a href="?$frontpage">$frontpage</a> | 
-                    @{[$canedit ? qq(<a href="?mycmd=edit&mypage=$mypage">$naviedit</a> | ) : '' ]}
-                    <a href="?mycmd=index">$naviindex</a> | 
+                    <a href="?$params->{frontpage}">$params->{frontpage}</a> | 
+                    @{[$canedit ? qq(<a href="?mycmd=edit&mypage=$params->{mypage}">$params->{naviedit}</a> | ) : '' ]}
+                    <a href="?mycmd=index">$params->{naviindex}</a> | 
                     <a href="http://www.hyuki.com/yukiwiki/mini/">YukiWikiMini</a>
                 </td>
             </tr>
