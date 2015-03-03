@@ -24,6 +24,7 @@ my $q = CGI->new;
 my $psgi_ret = main($q);
 my ($status,$headers,$html) = @$psgi_ret;
 
+print "Content-type: text/html; charset=utf-8\n\n";
 print $html;
 
 
@@ -148,8 +149,6 @@ sub render_header {
     };
 
     my $html =  <<"EOD";
-Content-type: text/html; charset=utf-8
-
 <!DOCTYPE html>
 <html>
     <head>
