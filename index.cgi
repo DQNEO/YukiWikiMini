@@ -39,9 +39,9 @@ sub main {
     $_ = $q->Vars->{mycmd};
     if (! $_) {
         $q->Vars->{mypage} = $frontpage;
-        do_read();
+        print do_read();
     } elsif (/^read$/) {
-        do_read();
+        print do_read();
     } elsif (/^write$/) {
         do_write();
     } elsif (/^edit$/) {
@@ -50,15 +50,17 @@ sub main {
         print do_index();
     } else {
         $q->Vars->{mypage} = $frontpage;
-        do_read();
+        print do_read();
     }
     dbmclose(%database);
 }
 
 sub do_read {
-    print render_header($q->param("mypage"), 1);
-    print render_content();
-    print render_footer();
+    my $html = "";
+    $html .= render_header($q->param("mypage"), 1);
+    $html .= render_content();
+    $html .= render_footer();
+    return $html;
 }
 
 sub do_edit {
@@ -184,7 +186,7 @@ sub render_content {
     !
         make_link($1)
     !gex;
-    return "<pre>", $_, "</pre>";
+    return "<pre>". $_. "</pre>";
 }
 
 sub make_link {
