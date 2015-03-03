@@ -126,18 +126,19 @@ sub do_index {
 sub do_write {
     my $q = shift;
 
-    my $html = "";
     if ($q->Vars->{mymsg}) {
         $database{$q->param("mypage")} = $q->Vars->{mymsg};
-        $html .= render_header($q->param("mypage"), 1);
-        $html .= render_content();
-        $html .= render_footer();
-        return $html;
+        return [
+            render_header($q->param("mypage"), 1),
+            render_content(),
+            render_footer(),
+            ];
     } else {
         delete $database{$q->param("mypage")};
-        $html .= render_header($q->param("mypage") . $msgdeleted, 0);
-        $html .= render_footer();
-        return $html;
+        return [
+            render_header($q->param("mypage") . $msgdeleted, 0),
+            render_footer()
+            ];
     }
 
 }
