@@ -7,7 +7,6 @@ our $VERSION = "1.2.1";
 
 my $dbname = 'ykwkmini';
 my $frontpage = 'FrontPage';
-my $indexpage = 'Index';
 my $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
 my $editchar = '?';
 my $naviwrite = 'Write';
@@ -21,59 +20,78 @@ my %form;
 my %database;
 my $q = CGI->new;
 
-print main();
+my $app = sub {
+    my $env = shift;
+    my $body;
 
-sub main {
-    if (! sanitize_form()) {
-        return render_error("(invalid mypage)");
+    my $status;
+    my $headers = ["Content-type" => "text/html; charset=utf-8"];
+    if (defined($q->param("mypage")) and $q->param("mypage") !~ /^$WikiName$/) {
+        $status = 200;
+        $body = do_error("(invalid mypage)");
+        return [$status,$headers, $body];
     }
 
-    if (defined $q->Vars->{keywords} && $q->Vars->{keywords} =~ /^($WikiName)$/) {
-        $q->Vars->{mycmd} = 'read';
-        $q->Vars->{mypage} = $1;
+    if (defined $env->Vars->{keywords} && $env->Vars->{keywords} =~ /^($WikiName)$/) {
+        $env->Vars->{mycmd} = 'read';
+        $env->Vars->{mypage} = $1;
     }
 
-    my $html;
     unless (dbmopen(%database, $dbname, 0666)) {
-        return render_error("(dbmopen)");
+        $status = 200;
+        $body =  do_error("(dbmopen)");
+        return [$status,$headers, $body];
     }
 
-    $_ = $q->Vars->{mycmd};
+    $_ = $env->Vars->{mycmd};
     if (! $_) {
-        $q->Vars->{mypage} = $frontpage;
-        $html = do_read();
+        $env->Vars->{mypage} = $frontpage;
+        $body = do_read($q);
     } elsif (/^read$/) {
-        $html = do_read();
+        $body = do_read($q);
     } elsif (/^write$/) {
-        $html = do_write();
+        $body = do_write($q);
     } elsif (/^edit$/) {
-        $html = do_edit();
+        $body = do_edit($q);
     } elsif (/^index$/) {
-        $html = do_index();
+        $body = do_index($q);
     } else {
-        $q->Vars->{mypage} = $frontpage;
-        $html = do_read();
+        $env->Vars->{mypage} = $frontpage;
+        $body = do_read($q);
     }
     dbmclose(%database);
-    return $html;
+    $status = 200;
+
+    return [$status,$headers, $body];
+};
+
+handle_psgi($app, $q);
+
+sub handle_psgi {
+    my ($app, $q) = @_;
+    my ($status,$headers,$body) = @{$app->($q)};
+    print $headers->[0], ":" , $headers->[1] , "\n";
+    print "\n";
+    print $_ for @$body;
 }
 
 sub do_read {
-    my $html = "";
-    $html .= render_header($q->param("mypage"), 1);
-    $html .= render_content();
-    $html .= render_footer();
-    return $html;
+    my $q = shift;
+    return [
+        render_header($q->param("mypage"), 1),
+        render_content(),
+        render_footer(),
+        ];
 }
 
 sub do_edit {
-    my $html = "";
-    $html .=  render_header($q->param("mypage"), 0);
+    my $q = shift;
+
     my $mymsg = escape($database{$q->param("mypage")});
     $mymsg = "" unless defined $mymsg;
     my $mypage = $q->param("mypage");
 
-    $html .=  <<"EOD";
+    my $form =  <<"EOD";
     <form action="." method="post">
         <input type="hidden" name="mycmd" value="write">
         <input type="hidden" name="mypage" value="$mypage">
@@ -82,46 +100,61 @@ sub do_edit {
         <input type="submit" value="$naviwrite">
     </form>
 EOD
-    $html .=  render_footer();
+
+    return [
+        render_header($q->param("mypage"), 0),
+        $form,
+        render_footer()
+        ];
 }
 
 sub do_index {
-    my $html = "";
-    $html .= render_header($indexpage, 0);
-    $html .= qq|<ul>\n|;
+    my $q = shift;
+    my $indexpage = 'Index';
+
+    my @li;
     foreach (sort keys %database) {
-        $html .= qq|<li><a href="?$_"><tt>$_</tt></a></li>\n|;
+        push @li, "<li><a href=\"?$_\"><tt>$_</tt></a></li>\n";
     }
-    $html .= qq|</ul>\n|;
-    $html .= render_footer();
-    return $html;
+
+    return [
+        render_header($indexpage, 0),
+        "<ul>\n",
+        @li,
+        "</ul>\n",
+        render_footer()
+        ];
 }
 
 sub do_write {
+    my $q = shift;
 
-    my $html = "";
     if ($q->Vars->{mymsg}) {
         $database{$q->param("mypage")} = $q->Vars->{mymsg};
-        $html .= render_header($q->param("mypage"), 1);
-        $html .= render_content();
+        return [
+            render_header($q->param("mypage"), 1),
+            render_content(),
+            render_footer(),
+            ];
     } else {
         delete $database{$q->param("mypage")};
-        $html .= render_header($q->param("mypage") . $msgdeleted, 0);
+        return [
+            render_header($q->param("mypage") . $msgdeleted, 0),
+            render_footer()
+            ];
     }
 
-    $html .= render_footer();
-    return $html;
 }
 
-sub render_error {
+sub do_error {
     my $msg = shift;
     my $errorpage = 'Error';
 
-    my $html;
-    $html = render_header($errorpage, 0);
-    $html .= "<h1>$msg</h1>";
-    $html .= render_footer();
-    return $html;
+    return [
+        render_header($errorpage, 0),
+        "<h1>$msg</h1>",
+        render_footer()
+        ];
 }
 
 sub render_header {
@@ -136,8 +169,6 @@ sub render_header {
     };
 
     my $html =  <<"EOD";
-Content-type: text/html; charset=utf-8
-
 <!DOCTYPE html>
 <html>
     <head>
@@ -212,9 +243,3 @@ sub make_link {
     }
 }
 
-sub sanitize_form {
-    if (defined($q->param("mypage")) and $q->param("mypage") !~ /^$WikiName$/) {
-        return 0;
-    }
-    return 1;
-}
