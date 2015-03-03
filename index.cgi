@@ -21,6 +21,9 @@ my $app = sub {
 
     my $status;
     my $headers = ["Content-type" => "text/html; charset=utf-8"];
+
+    my $cmd = $env->param("mycmd");
+
     if (defined($q->param("mypage")) and $q->param("mypage") !~ /^$WikiName$/) {
         $status = 200;
         $body = do_error("(invalid mypage)");
@@ -28,7 +31,7 @@ my $app = sub {
     }
 
     if ($ENV{QUERY_STRING} =~ /^($WikiName)$/) {
-        $env->Vars->{mycmd} = 'read';
+        $cmd = 'read';
         $env->Vars->{mypage} = $1;
     }
 
@@ -38,7 +41,7 @@ my $app = sub {
         return [$status,$headers, $body];
     }
 
-    $_ = $env->Vars->{mycmd};
+    $_ = $cmd;
     if (! $_) {
         $env->Vars->{mypage} = $frontpage;
         $body = do_read($q, $db);
