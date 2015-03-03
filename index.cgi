@@ -24,10 +24,14 @@ my $q = CGI->new;
 my $psgi_ret = main($q);
 my ($status,$headers,$html) = @$psgi_ret;
 
-print $headers->[0], ":" , $headers->[1] , "\n";
-print "\n";
-print $html;
+handle_psgi_ret($status, $headers, $html);
 
+sub handle_psgi_ret {
+    my ($status,$headers,$html) = @_;
+    print $headers->[0], ":" , $headers->[1] , "\n";
+    print "\n";
+    print $html;
+}
 
 sub main {
     my $env = shift;
