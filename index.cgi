@@ -43,7 +43,7 @@ sub main {
     } elsif (/^read$/) {
         print do_read();
     } elsif (/^write$/) {
-        do_write();
+        print do_write();
     } elsif (/^edit$/) {
         do_edit();
     } elsif (/^index$/) {
@@ -94,15 +94,18 @@ sub do_index {
 }
 
 sub do_write {
+
+    my $html = "";
     if ($q->Vars->{mymsg}) {
         $database{$q->param("mypage")} = $q->Vars->{mymsg};
-        print render_header($q->param("mypage"), 1);
-        print render_content();
+        $html .= render_header($q->param("mypage"), 1);
+        $html .= render_content();
     } else {
         delete $database{$q->param("mypage")};
-        print render_header($q->param("mypage") . $msgdeleted, 0);
+        $html .= render_header($q->param("mypage") . $msgdeleted, 0);
     }
-    print render_footer();
+
+    $html .= render_footer();
 }
 
 sub render_error {
