@@ -24,7 +24,7 @@ my $q = CGI->new;
 my $psgi_ret = main($q);
 my ($status,$headers,$html) = @$psgi_ret;
 
-print "Content-type: text/html; charset=utf-8\n\n";
+print $headers;
 print $html;
 
 
@@ -33,10 +33,11 @@ sub main {
     my $html;
 
     my $status;
+    my $headers = "Content-type: text/html; charset=utf-8\n\n";
     if (! sanitize_form()) {
         $html = render_error("(invalid mypage)");
         $status = 200;
-        return [$status,[], $html];
+        return [$status,$headers, $html];
     }
 
     if (defined $env->Vars->{keywords} && $env->Vars->{keywords} =~ /^($WikiName)$/) {
@@ -47,7 +48,7 @@ sub main {
     unless (dbmopen(%database, $dbname, 0666)) {
         $html =  render_error("(dbmopen)");
         $status = 200;
-        return [$status,[], $html];
+        return [$status,$headers, $html];
     }
 
     $_ = $env->Vars->{mycmd};
@@ -68,7 +69,7 @@ sub main {
     }
     dbmclose(%database);
     $status = 200;
-    return [$status,[], $html];
+    return [$status,$headers, $html];
 }
 
 sub do_read {
