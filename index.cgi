@@ -8,76 +8,72 @@ our $VERSION = "1.2.0";
 my $dbname = 'ykwkmini';
 my $frontpage = 'FrontPage';
 my $indexpage = 'Index';
-my $errorpage = 'Error';
 my $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
 my $editchar = '?';
-my $bgcolor = 'white';
 my $naviwrite = 'Write';
 my $naviedit = 'Edit';
 my $naviindex = 'Index';
 my $msgdeleted = ' is deleted.';
 my $cols = 80;
 my $rows = 20;
-my $style = <<'EOD';
-<style type="text/css">
-<!--
-body { font-family: "Courier New", monospace; }
-pre { line-height:130%; }
-a { text-decoration: none }
-a:hover { text-decoration: underline }
--->
-</style>
-EOD
 
 my %form;
 my %database;
 my $q = CGI->new;
 
-main();
+print main();
 
 sub main {
-    sanitize_form();
+    if (! sanitize_form()) {
+        return render_error("(invalid mypage)");
+    }
 
     if (defined $q->Vars->{keywords} && $q->Vars->{keywords} =~ /^($WikiName)$/) {
         $q->Vars->{mycmd} = 'read';
         $q->Vars->{mypage} = $1;
     }
 
+    my $html;
     unless (dbmopen(%database, $dbname, 0666)) {
-        print_error("(dbmopen)");
+        return render_error("(dbmopen)");
     }
+
     $_ = $q->Vars->{mycmd};
     if (! $_) {
         $q->Vars->{mypage} = $frontpage;
-        do_read();
+        $html = do_read();
     } elsif (/^read$/) {
-        do_read();
+        $html = do_read();
     } elsif (/^write$/) {
-        do_write();
+        $html = do_write();
     } elsif (/^edit$/) {
-        do_edit();
+        $html = do_edit();
     } elsif (/^index$/) {
-        do_index();
+        $html = do_index();
     } else {
         $q->Vars->{mypage} = $frontpage;
-        do_read();
+        $html = do_read();
     }
     dbmclose(%database);
+    return $html;
 }
 
 sub do_read {
-    print_header($q->param("mypage"), 1);
-    print_content();
-    print_footer();
+    my $html = "";
+    $html .= render_header($q->param("mypage"), 1);
+    $html .= render_content();
+    $html .= render_footer();
+    return $html;
 }
 
 sub do_edit {
-    print_header($q->param("mypage"), 0);
+    my $html = "";
+    $html .=  render_header($q->param("mypage"), 0);
     my $mymsg = escape($database{$q->param("mypage")});
     $mymsg = "" unless defined $mymsg;
     my $mypage = $q->param("mypage");
 
-    print <<"EOD";
+    $html .=  <<"EOD";
     <form action="." method="post">
         <input type="hidden" name="mycmd" value="write">
         <input type="hidden" name="mypage" value="$mypage">
@@ -86,62 +82,86 @@ sub do_edit {
         <input type="submit" value="$naviwrite">
     </form>
 EOD
-    print_footer();
+    $html .=  render_footer();
 }
 
 sub do_index {
-    print_header($indexpage, 0);
-    print qq|<ul>\n|;
+    my $html = "";
+    $html .= render_header($indexpage, 0);
+    $html .= qq|<ul>\n|;
     foreach (sort keys %database) {
-        print qq|<li><a href="?$_"><tt>$_</tt></a></li>\n|
+        $html .= qq|<li><a href="?$_"><tt>$_</tt></a></li>\n|;
     }
-    print qq|</ul>\n|;
-    print_footer();
+    $html .= qq|</ul>\n|;
+    $html .= render_footer();
+    return $html;
 }
 
 sub do_write {
+
+    my $html = "";
     if ($q->Vars->{mymsg}) {
         $database{$q->param("mypage")} = $q->Vars->{mymsg};
-        print_header($q->param("mypage"), 1);
-        print_content();
+        $html .= render_header($q->param("mypage"), 1);
+        $html .= render_content();
     } else {
         delete $database{$q->param("mypage")};
-        print_header($q->param("mypage") . $msgdeleted, 0);
+        $html .= render_header($q->param("mypage") . $msgdeleted, 0);
     }
-    print_footer();
+
+    $html .= render_footer();
+    return $html;
 }
 
-sub print_error {
+sub render_error {
     my $msg = shift;
-    print_header($errorpage, 0);
-    print "<h1>$msg</h1>";
-    print_footer();
-    exit(0);
+    my $errorpage = 'Error';
+
+    my $html;
+    $html = render_header($errorpage, 0);
+    $html .= "<h1>$msg</h1>";
+    $html .= render_footer();
+    return $html;
 }
 
-sub print_header {
+sub render_header {
     my ($title, $canedit) = @_;
-    my $mypage = $q->param("mypage");
-    print <<"EOD";
+    my $params = {
+        title => $title,
+        frontpage => $frontpage,
+        mypage => $q->param("mypage") || "",
+        naviedit => $naviedit,
+        naviindex => $naviindex,
+        canedit => $canedit,
+    };
+
+    my $html =  <<"EOD";
 Content-type: text/html; charset=utf-8
 
 <!DOCTYPE html>
 <html>
     <head>
     <meta charset="utf-8">
-    <title>$title</title>
-    $style
+    <title>$params->{title}</title>
+    <style type="text/css">
+    <!--
+    body { font-family: "Courier New", monospace; }
+    pre { line-height:130%; }
+    a { text-decoration: none }
+    a:hover { text-decoration: underline }
+    -->
+    </style>
     </head>
-    <body bgcolor="$bgcolor">
+    <body bgcolor="white">
         <table width="100%" border="0">
             <tr valign="top">
                 <td>
-                    <h1>$title</h1>
+                    <h1>$params->{title}</h1>
                 </td>
                 <td align="right">
-                    <a href="?$frontpage">$frontpage</a> | 
-                    @{[$canedit ? qq(<a href="?mycmd=edit&mypage=$mypage">$naviedit</a> | ) : '' ]}
-                    <a href="?mycmd=index">$naviindex</a> | 
+                    <a href="?$params->{frontpage}">$params->{frontpage}</a> | 
+                    @{[$params->{canedit} ? qq(<a href="?mycmd=edit&mypage=$params->{mypage}">$params->{naviedit}</a> | ) : '' ]}
+                    <a href="?mycmd=index">$params->{naviindex}</a> | 
                     <a href="http://www.hyuki.com/yukiwiki/mini/">YukiWikiMini</a>
                 </td>
             </tr>
@@ -149,8 +169,8 @@ Content-type: text/html; charset=utf-8
 EOD
 }
 
-sub print_footer {
-    print "</body></html>";
+sub render_footer {
+    return "</body></html>";
 }
 
 sub escape {
@@ -165,7 +185,7 @@ sub escape {
     return $_;
 }
 
-sub print_content {
+sub render_content {
     $_ = escape($database{$q->param("mypage")});
     s!
         (
@@ -176,7 +196,7 @@ sub print_content {
     !
         make_link($1)
     !gex;
-    print "<pre>", $_, "</pre>";
+    return "<pre>". $_. "</pre>";
 }
 
 sub make_link {
@@ -194,6 +214,7 @@ sub make_link {
 
 sub sanitize_form {
     if (defined($q->param("mypage")) and $q->param("mypage") !~ /^$WikiName$/) {
-        print_error("(invalid mypage)");
+        return 0;
     }
+    return 1;
 }
