@@ -11,7 +11,6 @@ my $indexpage = 'Index';
 my $errorpage = 'Error';
 my $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
 my $editchar = '?';
-my $bgcolor = 'white';
 my $naviwrite = 'Write';
 my $naviedit = 'Edit';
 my $naviindex = 'Index';
@@ -127,6 +126,7 @@ sub print_header {
         mypage => $q->param("mypage") || "",
         naviedit => $naviedit,
         naviindex => $naviindex,
+        canedit => $canedit,
     };
 
     print <<"EOD";
@@ -139,7 +139,7 @@ Content-type: text/html; charset=utf-8
     <title>$params->{title}</title>
     $style
     </head>
-    <body bgcolor="$bgcolor">
+    <body bgcolor="white">
         <table width="100%" border="0">
             <tr valign="top">
                 <td>
@@ -147,7 +147,7 @@ Content-type: text/html; charset=utf-8
                 </td>
                 <td align="right">
                     <a href="?$params->{frontpage}">$params->{frontpage}</a> | 
-                    @{[$canedit ? qq(<a href="?mycmd=edit&mypage=$params->{mypage}">$params->{naviedit}</a> | ) : '' ]}
+                    @{[$params->{canedit} ? qq(<a href="?mycmd=edit&mypage=$params->{mypage}">$params->{naviedit}</a> | ) : '' ]}
                     <a href="?mycmd=index">$params->{naviindex}</a> | 
                     <a href="http://www.hyuki.com/yukiwiki/mini/">YukiWikiMini</a>
                 </td>
