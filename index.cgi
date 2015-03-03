@@ -26,8 +26,7 @@ print main();
 
 sub main {
     if (! sanitize_form()) {
-        print render_error("(invalid mypage)");
-        exit(0);
+        return render_error("(invalid mypage)");
     }
 
     if (defined $q->Vars->{keywords} && $q->Vars->{keywords} =~ /^($WikiName)$/) {
