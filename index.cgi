@@ -55,13 +55,13 @@ sub main {
 }
 
 sub do_read {
-    print_header($q->param("mypage"), 1);
+    print render_header($q->param("mypage"), 1);
     print_content();
     print_footer();
 }
 
 sub do_edit {
-    print_header($q->param("mypage"), 0);
+    print render_header($q->param("mypage"), 0);
     my $mymsg = escape($database{$q->param("mypage")});
     $mymsg = "" unless defined $mymsg;
     my $mypage = $q->param("mypage");
@@ -79,7 +79,7 @@ EOD
 }
 
 sub do_index {
-    print_header($indexpage, 0);
+    print render_header($indexpage, 0);
     print qq|<ul>\n|;
     foreach (sort keys %database) {
         print qq|<li><a href="?$_"><tt>$_</tt></a></li>\n|
@@ -91,24 +91,24 @@ sub do_index {
 sub do_write {
     if ($q->Vars->{mymsg}) {
         $database{$q->param("mypage")} = $q->Vars->{mymsg};
-        print_header($q->param("mypage"), 1);
+        print render_header($q->param("mypage"), 1);
         print_content();
     } else {
         delete $database{$q->param("mypage")};
-        print_header($q->param("mypage") . $msgdeleted, 0);
+        print render_header($q->param("mypage") . $msgdeleted, 0);
     }
     print_footer();
 }
 
 sub print_error {
     my $msg = shift;
-    print_header($errorpage, 0);
+    print render_header($errorpage, 0);
     print "<h1>$msg</h1>";
     print_footer();
     exit(0);
 }
 
-sub print_header {
+sub render_header {
     my ($title, $canedit) = @_;
     my $params = {
         title => $title,
@@ -119,7 +119,7 @@ sub print_header {
         canedit => $canedit,
     };
 
-    print <<"EOD";
+    my $html =  <<"EOD";
 Content-type: text/html; charset=utf-8
 
 <!DOCTYPE html>
