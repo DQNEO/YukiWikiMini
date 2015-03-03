@@ -29,7 +29,7 @@ my $app = sub {
     if (defined($q->param("mypage")) and $q->param("mypage") !~ /^$WikiName$/) {
         $html = render_error("(invalid mypage)");
         $status = 200;
-        return [$status,$headers, [$html]];
+        return [$status,$headers, $html];
     }
 
     if (defined $env->Vars->{keywords} && $env->Vars->{keywords} =~ /^($WikiName)$/) {
@@ -40,7 +40,7 @@ my $app = sub {
     unless (dbmopen(%database, $dbname, 0666)) {
         $html =  render_error("(dbmopen)");
         $status = 200;
-        return [$status,$headers, [$html]];
+        return [$status,$headers, $html];
     }
 
     $_ = $env->Vars->{mycmd};
@@ -147,11 +147,11 @@ sub render_error {
     my $msg = shift;
     my $errorpage = 'Error';
 
-    my $html;
-    $html = render_header($errorpage, 0);
-    $html .= "<h1>$msg</h1>";
-    $html .= render_footer();
-    return $html;
+    return [
+        render_header($errorpage, 0),
+        "<h1>$msg</h1>",
+        render_footer()
+        ];
 }
 
 sub render_header {
