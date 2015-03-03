@@ -25,7 +25,10 @@ my $q = CGI->new;
 print main();
 
 sub main {
-    sanitize_form();
+    if (! sanitize_form()) {
+        print render_error("(invalid mypage)");
+        exit(0);
+    }
 
     if (defined $q->Vars->{keywords} && $q->Vars->{keywords} =~ /^($WikiName)$/) {
         $q->Vars->{mycmd} = 'read';
@@ -211,7 +214,7 @@ sub make_link {
 
 sub sanitize_form {
     if (defined($q->param("mypage")) and $q->param("mypage") !~ /^$WikiName$/) {
-        print render_error("(invalid mypage)");
-        exit(0);
+        return 0;
     }
+    return 1;
 }
