@@ -15,10 +15,11 @@ my $msgdeleted = ' is deleted.';
 my $cols = 80;
 my $rows = 20;
 
-my $db = {};
 
 my $app = sub {
     my $env = my $q = shift;
+
+    my $db = {};
     my $body;
 
     my $status;
