@@ -29,7 +29,8 @@ sub main {
     my $env = shift;
     my $html;
     if (! sanitize_form()) {
-        return render_error("(invalid mypage)");
+        $html = render_error("(invalid mypage)");
+        return $html;
     }
 
     if (defined $env->Vars->{keywords} && $env->Vars->{keywords} =~ /^($WikiName)$/) {
