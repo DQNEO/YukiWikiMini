@@ -65,10 +65,11 @@ my $app = sub {
     return [$status,$headers, [$html]];
 };
 
-handle_psgi_ret(@{$app->($q)});
+handle_psgi_ret($app, $q);
 
 sub handle_psgi_ret {
-    my ($status,$headers,$body) = @_;
+    my ($app, $q) = @_;
+    my ($status,$headers,$body) = @{$app->($q)};
     print $headers->[0], ":" , $headers->[1] , "\n";
     print "\n";
     print $body->[0];
