@@ -22,9 +22,9 @@ my %database;
 my $q = CGI->new;
 
 my $psgi_ret = main($q);
-my ($status,$headers,$html) = @$psgi_ret;
+my ($status,$headers,$body) = @$psgi_ret;
 
-handle_psgi_ret($status, $headers, $html);
+handle_psgi_ret($status, $headers, $body);
 
 sub handle_psgi_ret {
     my ($status,$headers,$body) = @_;
