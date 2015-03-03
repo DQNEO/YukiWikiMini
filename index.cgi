@@ -27,7 +27,7 @@ my $app = sub {
 
     my $status;
     my $headers = ["Content-type" => "text/html; charset=utf-8"];
-    if (! sanitize_form()) {
+    if (defined($q->param("mypage")) and $q->param("mypage") !~ /^$WikiName$/) {
         $html = render_error("(invalid mypage)");
         $status = 200;
         return [$status,$headers, [$html]];
@@ -227,9 +227,3 @@ sub make_link {
     }
 }
 
-sub sanitize_form {
-    if (defined($q->param("mypage")) and $q->param("mypage") !~ /^$WikiName$/) {
-        return 0;
-    }
-    return 1;
-}
