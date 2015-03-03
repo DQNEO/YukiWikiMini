@@ -8,7 +8,6 @@ our $VERSION = "1.2.0";
 my $dbname = 'ykwkmini';
 my $frontpage = 'FrontPage';
 my $indexpage = 'Index';
-my $errorpage = 'Error';
 my $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
 my $editchar = '?';
 my $naviwrite = 'Write';
@@ -116,6 +115,8 @@ sub do_write {
 
 sub render_error {
     my $msg = shift;
+    my $errorpage = 'Error';
+
     my $html;
     $html = render_header($errorpage, 0);
     $html .= "<h1>$msg</h1>";
