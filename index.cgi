@@ -62,8 +62,7 @@ my $app = sub {
     dbmclose(%database);
     $status = 200;
 
-    my $body = ref $html ? $html : [$html];
-    return [$status,$headers, $body];
+    return [$status,$headers, $html];
 };
 
 handle_psgi($app, $q);
