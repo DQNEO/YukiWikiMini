@@ -78,7 +78,7 @@ sub do_read {
     my $db = shift;
     return [
         render_header($q->param("mypage"), 1),
-        render_content($db->{$q->param("mypage")}),
+        render_content($db, $q->param("mypage")),
         render_footer(),
         ];
 }
@@ -133,7 +133,7 @@ sub do_write {
         $db->{$q->param("mypage")} = $q->Vars->{mymsg};
         return [
             render_header($q->param("mypage"), 1),
-            render_content($db->{$q->param("mypage")}),
+            render_content($db, $q->param("mypage")),
             render_footer(),
             ];
     } else {
@@ -217,8 +217,9 @@ sub escape {
 }
 
 sub render_content {
-    my $content = shift;
-    $_ = escape($content);
+    my $db = shift;
+    my $mypage = shift;
+    $_ = escape($db->{$mypage});
     s!
         (
             ((mailto|http|https|ftp):[\x21-\x7E]*)  # Direct http://...
@@ -226,13 +227,14 @@ sub render_content {
             ($WikiName)                             # LocalLinkLikeThis
         )
     !
-        make_link($1)
+        make_link($1, $db)
     !gex;
     return "<pre>". $_. "</pre>";
 }
 
 sub make_link {
     $_ = shift;
+    my $db = shift;
     if (/^(http|https|ftp):/) {
         return qq|<a href="$_">$_</a>|;
     } elsif (/^(mailto):(.*)/) {
