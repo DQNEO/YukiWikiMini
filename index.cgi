@@ -33,7 +33,8 @@ sub main {
     }
 
     unless (dbmopen(%database, $dbname, 0666)) {
-        print_error("(dbmopen)");
+        print render_error("(dbmopen)");
+        exit(0);
     }
     $_ = $q->Vars->{mycmd};
     if (! $_) {
@@ -56,8 +57,8 @@ sub main {
 
 sub do_read {
     print render_header($q->param("mypage"), 1);
-    print_content();
-    print_footer();
+    print render_content();
+    print render_footer();
 }
 
 sub do_edit {
@@ -75,7 +76,7 @@ sub do_edit {
         <input type="submit" value="$naviwrite">
     </form>
 EOD
-    print_footer();
+    print render_footer();
 }
 
 sub do_index {
@@ -85,27 +86,28 @@ sub do_index {
         print qq|<li><a href="?$_"><tt>$_</tt></a></li>\n|
     }
     print qq|</ul>\n|;
-    print_footer();
+    print render_footer();
 }
 
 sub do_write {
     if ($q->Vars->{mymsg}) {
         $database{$q->param("mypage")} = $q->Vars->{mymsg};
         print render_header($q->param("mypage"), 1);
-        print_content();
+        print render_content();
     } else {
         delete $database{$q->param("mypage")};
         print render_header($q->param("mypage") . $msgdeleted, 0);
     }
-    print_footer();
+    print render_footer();
 }
 
-sub print_error {
+sub render_error {
     my $msg = shift;
-    print render_header($errorpage, 0);
-    print "<h1>$msg</h1>";
-    print_footer();
-    exit(0);
+    my $html;
+    $html = render_header($errorpage, 0);
+    $html .= "<h1>$msg</h1>";
+    $html .= render_footer();
+    return $html;
 }
 
 sub render_header {
@@ -153,8 +155,8 @@ Content-type: text/html; charset=utf-8
 EOD
 }
 
-sub print_footer {
-    print "</body></html>";
+sub render_footer {
+    return "</body></html>";
 }
 
 sub escape {
@@ -169,7 +171,7 @@ sub escape {
     return $_;
 }
 
-sub print_content {
+sub render_content {
     $_ = escape($database{$q->param("mypage")});
     s!
         (
@@ -180,7 +182,7 @@ sub print_content {
     !
         make_link($1)
     !gex;
-    print "<pre>", $_, "</pre>";
+    return "<pre>", $_, "</pre>";
 }
 
 sub make_link {
@@ -198,6 +200,7 @@ sub make_link {
 
 sub sanitize_form {
     if (defined($q->param("mypage")) and $q->param("mypage") !~ /^$WikiName$/) {
-        print_error("(invalid mypage)");
+        print render_error("(invalid mypage)");
+        exit(0);
     }
 }
