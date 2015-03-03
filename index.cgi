@@ -109,15 +109,18 @@ sub do_index {
     my $q = shift;
     my $indexpage = 'Index';
 
-    my $html = "";
-    $html .= render_header($indexpage, 0);
-    $html .= qq|<ul>\n|;
+    my @li;
     foreach (sort keys %database) {
-        $html .= qq|<li><a href="?$_"><tt>$_</tt></a></li>\n|;
+        push @li, qq|<li><a href="?$_"><tt>$_</tt></a></li>\n|;
     }
-    $html .= qq|</ul>\n|;
-    $html .= render_footer();
-    return [ $html ];
+
+    return [
+        render_header($indexpage, 0),
+        qq|<ul>\n|,
+        @li,
+        qq|</ul>\n|,
+        render_footer()
+        ];
 }
 
 sub do_write {
