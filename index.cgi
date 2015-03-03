@@ -7,7 +7,6 @@ our $VERSION = "1.2.1";
 
 my $dbname = 'ykwkmini';
 my $frontpage = 'FrontPage';
-my $indexpage = 'Index';
 my $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
 my $editchar = '?';
 my $naviwrite = 'Write';
@@ -106,6 +105,8 @@ EOD
 
 sub do_index {
     my $q = shift;
+    my $indexpage = 'Index';
+
     my $html = "";
     $html .= render_header($indexpage, 0);
     $html .= qq|<ul>\n|;
