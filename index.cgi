@@ -23,8 +23,8 @@ my $app = sub {
     my $headers = ["Content-type" => "text/html; charset=utf-8"];
 
     my $cmd = $env->param("mycmd");
-
-    if (defined($q->param("mypage")) and $q->param("mypage") !~ /^$WikiName$/) {
+    my $mypage = $q->param("mypage");
+    if (defined($mypage) and $mypage !~ /^$WikiName$/) {
         $status = 200;
         $body = do_error("(invalid mypage)");
         return [$status,$headers, $body];
@@ -32,7 +32,7 @@ my $app = sub {
 
     if ($ENV{QUERY_STRING} =~ /^($WikiName)$/) {
         $cmd = 'read';
-        $env->Vars->{mypage} = $1;
+        $mypage = $1;
     }
 
     unless (db_open($db)) {
@@ -43,19 +43,17 @@ my $app = sub {
 
     $_ = $cmd;
     if (! $_) {
-        $env->Vars->{mypage} = $frontpage;
-        $body = do_read($q, $db);
+        $body = do_read($q, $db,$frontpage);
     } elsif (/^read$/) {
-        $body = do_read($q, $db);
+        $body = do_read($q, $db, $mypage);
     } elsif (/^write$/) {
-        $body = do_write($q, $db);
+        $body = do_write($q, $db, $mypage);
     } elsif (/^edit$/) {
-        $body = do_edit($q, $db);
+        $body = do_edit($q, $db, $mypage);
     } elsif (/^index$/) {
         $body = do_index($q, $db);
     } else {
-        $env->Vars->{mypage} = $frontpage;
-        $body = do_read($q, $db);
+        $body = do_read($q, $db, $frontpage);
     }
     db_close($db);
     $status = 200;
@@ -76,9 +74,10 @@ sub handle_psgi {
 sub do_read {
     my $q = shift;
     my $db = shift;
+    my $mypage = shift;
     return [
-        render_header($q->param("mypage"), 1),
-        render_content($db, $q->param("mypage")),
+        render_header($mypage, 1),
+        render_content($db, $mypage),
         render_footer(),
         ];
 }
@@ -86,9 +85,9 @@ sub do_read {
 sub do_edit {
     my $q = shift;
     my $db = shift;
-    my $mymsg = escape($db->{$q->param("mypage")});
+    my $mypage = shift;
+    my $mymsg = escape($db->{$mypage});
     $mymsg = "" unless defined $mymsg;
-    my $mypage = $q->param("mypage");
 
     my $form =  <<"EOD";
     <form action="." method="post">
@@ -101,7 +100,7 @@ sub do_edit {
 EOD
 
     return [
-        render_header($q->param("mypage"), 0),
+        render_header($mypage, 0),
         $form,
         render_footer()
         ];
@@ -129,17 +128,18 @@ sub do_index {
 sub do_write {
     my $q = shift;
     my $db = shift;
+    my $mypage = shift;
     if ($q->Vars->{mymsg}) {
-        $db->{$q->param("mypage")} = $q->Vars->{mymsg};
+        $db->{$mypage} = $q->Vars->{mymsg};
         return [
-            render_header($q->param("mypage"), 1),
-            render_content($db, $q->param("mypage")),
+            render_header($mypage, 1),
+            render_content($db, $mypage),
             render_footer(),
             ];
     } else {
-        delete $db->{$q->param("mypage")};
+        delete $db->{$mypage};
         return [
-            render_header($q->param("mypage") . $msgdeleted, 0),
+            render_header($mypage . $msgdeleted, 0),
             render_footer()
             ];
     }
