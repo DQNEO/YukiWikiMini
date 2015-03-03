@@ -27,7 +27,7 @@ my $app = sub {
     my $status;
     my $headers = ["Content-type" => "text/html; charset=utf-8"];
     if (defined($q->param("mypage")) and $q->param("mypage") !~ /^$WikiName$/) {
-        $html = render_error("(invalid mypage)");
+        $html = do_error("(invalid mypage)");
         $status = 200;
         return [$status,$headers, $html];
     }
@@ -38,7 +38,7 @@ my $app = sub {
     }
 
     unless (dbmopen(%database, $dbname, 0666)) {
-        $html =  render_error("(dbmopen)");
+        $html =  do_error("(dbmopen)");
         $status = 200;
         return [$status,$headers, $html];
     }
@@ -143,7 +143,7 @@ sub do_write {
 
 }
 
-sub render_error {
+sub do_error {
     my $msg = shift;
     my $errorpage = 'Error';
 
