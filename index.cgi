@@ -27,7 +27,7 @@ my $app = sub {
         return [$status,$headers, $body];
     }
 
-    if (defined $env->Vars->{keywords} && $env->Vars->{keywords} =~ /^($WikiName)$/) {
+    if ($ENV{QUERY_STRING} =~ /^($WikiName)$/) {
         $env->Vars->{mycmd} = 'read';
         $env->Vars->{mypage} = $1;
     }
