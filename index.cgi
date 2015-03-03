@@ -43,18 +43,18 @@ my $app = sub {
     $_ = $env->Vars->{mycmd};
     if (! $_) {
         $env->Vars->{mypage} = $frontpage;
-        $body = do_read($q);
+        $body = do_read($q, $db);
     } elsif (/^read$/) {
-        $body = do_read($q);
+        $body = do_read($q, $db);
     } elsif (/^write$/) {
-        $body = do_write($q);
+        $body = do_write($q, $db);
     } elsif (/^edit$/) {
-        $body = do_edit($q);
+        $body = do_edit($q, $db);
     } elsif (/^index$/) {
-        $body = do_index($q);
+        $body = do_index($q, $db);
     } else {
         $env->Vars->{mypage} = $frontpage;
-        $body = do_read($q);
+        $body = do_read($q, $db);
     }
     db_close($db);
     $status = 200;
@@ -75,17 +75,18 @@ sub handle_psgi {
 
 sub do_read {
     my $q = shift;
+    my $db = shift;
     return [
         render_header($q->param("mypage"), 1),
-        render_content(),
+        render_content($db->{$q->param("mypage")}),
         render_footer(),
         ];
 }
 
 sub do_edit {
     my $q = shift;
-
-    my $mymsg = escape($database{$q->param("mypage")});
+    my $db = shift;
+    my $mymsg = escape($db->{$q->param("mypage")});
     $mymsg = "" unless defined $mymsg;
     my $mypage = $q->param("mypage");
 
@@ -108,10 +109,11 @@ EOD
 
 sub do_index {
     my $q = shift;
+    my $db = shift;
     my $indexpage = 'Index';
 
     my @li;
-    foreach (sort keys %database) {
+    foreach (sort keys %$db) {
         push @li, "<li><a href=\"?$_\"><tt>$_</tt></a></li>\n";
     }
 
@@ -126,16 +128,16 @@ sub do_index {
 
 sub do_write {
     my $q = shift;
-
+    my $db = shift;
     if ($q->Vars->{mymsg}) {
-        $database{$q->param("mypage")} = $q->Vars->{mymsg};
+        $db->{$q->param("mypage")} = $q->Vars->{mymsg};
         return [
             render_header($q->param("mypage"), 1),
-            render_content(),
+            render_content($db->{$q->param("mypage")}),
             render_footer(),
             ];
     } else {
-        delete $database{$q->param("mypage")};
+        delete $db->{$q->param("mypage")};
         return [
             render_header($q->param("mypage") . $msgdeleted, 0),
             render_footer()
@@ -215,7 +217,8 @@ sub escape {
 }
 
 sub render_content {
-    $_ = escape($database{$q->param("mypage")});
+    my $content = shift;
+    $_ = escape($content);
     s!
         (
             ((mailto|http|https|ftp):[\x21-\x7E]*)  # Direct http://...
@@ -234,7 +237,7 @@ sub make_link {
         return qq|<a href="$_">$_</a>|;
     } elsif (/^(mailto):(.*)/) {
         return qq|<a href="$_">$2</a>|;
-    } elsif ($database{$_}) {
+    } elsif ($db->{$_}) {
         return qq|<a href="?$_">$_</a>|;
     } else {
         return qq|$_<a href="?mycmd=edit&mypage=$_">$editchar</a>|;
