@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use CGI;
 
-our $VERSION = "1.2.0";
+our $VERSION = "1.2.1";
 
 my $dbname = 'ykwkmini';
 my $frontpage = 'FrontPage';
