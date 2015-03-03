@@ -17,16 +17,6 @@ my $naviindex = 'Index';
 my $msgdeleted = ' is deleted.';
 my $cols = 80;
 my $rows = 20;
-my $style = <<'EOD';
-<style type="text/css">
-<!--
-body { font-family: "Courier New", monospace; }
-pre { line-height:130%; }
-a { text-decoration: none }
-a:hover { text-decoration: underline }
--->
-</style>
-EOD
 
 my %form;
 my %database;
@@ -137,7 +127,14 @@ Content-type: text/html; charset=utf-8
     <head>
     <meta charset="utf-8">
     <title>$params->{title}</title>
-    $style
+    <style type="text/css">
+    <!--
+    body { font-family: "Courier New", monospace; }
+    pre { line-height:130%; }
+    a { text-decoration: none }
+    a:hover { text-decoration: underline }
+    -->
+    </style>
     </head>
     <body bgcolor="white">
         <table width="100%" border="0">
