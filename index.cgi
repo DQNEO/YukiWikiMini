@@ -87,13 +87,12 @@ sub do_read {
 
 sub do_edit {
     my $q = shift;
-    my $html = "";
-    $html .=  render_header($q->param("mypage"), 0);
+
     my $mymsg = escape($database{$q->param("mypage")});
     $mymsg = "" unless defined $mymsg;
     my $mypage = $q->param("mypage");
 
-    $html .=  <<"EOD";
+    my $form =  <<"EOD";
     <form action="." method="post">
         <input type="hidden" name="mycmd" value="write">
         <input type="hidden" name="mypage" value="$mypage">
@@ -102,7 +101,12 @@ sub do_edit {
         <input type="submit" value="$naviwrite">
     </form>
 EOD
-    $html .=  render_footer();
+
+    return [
+        render_header($q->param("mypage"), 0),
+        $form,
+        render_footer()
+        ];
 }
 
 sub do_index {
