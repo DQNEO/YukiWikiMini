@@ -39,7 +39,8 @@ sub main {
     }
 
     unless (dbmopen(%database, $dbname, 0666)) {
-        return render_error("(dbmopen)");
+        $html =  render_error("(dbmopen)");
+        return $html;
     }
 
     $_ = $env->Vars->{mycmd};
