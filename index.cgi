@@ -21,16 +21,20 @@ my %form;
 my %database;
 my $q = CGI->new;
 
-my $html = main($q);
+my $psgi_ret = main($q);
+my ($status, $html) = @$psgi_ret;
 print $html;
 
 
 sub main {
     my $env = shift;
     my $html;
+
+    my $status;
     if (! sanitize_form()) {
         $html = render_error("(invalid mypage)");
-        return $html;
+        $status = 200;
+        return [$status, $html];
     }
 
     if (defined $env->Vars->{keywords} && $env->Vars->{keywords} =~ /^($WikiName)$/) {
@@ -40,7 +44,8 @@ sub main {
 
     unless (dbmopen(%database, $dbname, 0666)) {
         $html =  render_error("(dbmopen)");
-        return $html;
+        $status = 200;
+        return [$status, $html];
     }
 
     $_ = $env->Vars->{mycmd};
@@ -60,7 +65,8 @@ sub main {
         $html = do_read();
     }
     dbmclose(%database);
-    return $html;
+    $status = 200;
+    return [$status, $html];
 }
 
 sub do_read {
