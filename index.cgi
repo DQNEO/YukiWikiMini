@@ -22,14 +22,14 @@ my $q = CGI->new;
 
 my $app = sub {
     my $env = shift;
-    my $html;
+    my $body;
 
     my $status;
     my $headers = ["Content-type" => "text/html; charset=utf-8"];
     if (defined($q->param("mypage")) and $q->param("mypage") !~ /^$WikiName$/) {
         $status = 200;
-        $html = do_error("(invalid mypage)");
-        return [$status,$headers, $html];
+        $body = do_error("(invalid mypage)");
+        return [$status,$headers, $body];
     }
 
     if (defined $env->Vars->{keywords} && $env->Vars->{keywords} =~ /^($WikiName)$/) {
@@ -39,30 +39,30 @@ my $app = sub {
 
     unless (dbmopen(%database, $dbname, 0666)) {
         $status = 200;
-        $html =  do_error("(dbmopen)");
-        return [$status,$headers, $html];
+        $body =  do_error("(dbmopen)");
+        return [$status,$headers, $body];
     }
 
     $_ = $env->Vars->{mycmd};
     if (! $_) {
         $env->Vars->{mypage} = $frontpage;
-        $html = do_read($q);
+        $body = do_read($q);
     } elsif (/^read$/) {
-        $html = do_read($q);
+        $body = do_read($q);
     } elsif (/^write$/) {
-        $html = do_write($q);
+        $body = do_write($q);
     } elsif (/^edit$/) {
-        $html = do_edit($q);
+        $body = do_edit($q);
     } elsif (/^index$/) {
-        $html = do_index($q);
+        $body = do_index($q);
     } else {
         $env->Vars->{mypage} = $frontpage;
-        $html = do_read($q);
+        $body = do_read($q);
     }
     dbmclose(%database);
     $status = 200;
 
-    return [$status,$headers, $html];
+    return [$status,$headers, $body];
 };
 
 handle_psgi($app, $q);
