@@ -12,9 +12,6 @@ my $naviwrite = 'Write';
 my $naviedit = 'Edit';
 my $naviindex = 'Index';
 my $msgdeleted = ' is deleted.';
-my $cols = 80;
-my $rows = 20;
-
 
 my $app = sub {
     my $env = my $q = shift;
@@ -24,15 +21,18 @@ my $app = sub {
 
     my $status;
     my $headers = ["Content-type" => "text/html; charset=utf-8"];
-    if (defined($q->param("mypage")) and $q->param("mypage") !~ /^$WikiName$/) {
+
+    my $cmd = $env->param("mycmd");
+    my $mypage = $q->param("mypage");
+    if (defined($mypage) and $mypage !~ /^$WikiName$/) {
         $status = 200;
         $body = do_error("(invalid mypage)");
         return [$status,$headers, $body];
     }
 
-    if (defined $env->Vars->{keywords} && $env->Vars->{keywords} =~ /^($WikiName)$/) {
-        $env->Vars->{mycmd} = 'read';
-        $env->Vars->{mypage} = $1;
+    if ($ENV{QUERY_STRING} =~ /^($WikiName)$/) {
+        $cmd = 'read';
+        $mypage = $1;
     }
 
     unless (db_open($db)) {
@@ -41,21 +41,19 @@ my $app = sub {
         return [$status,$headers, $body];
     }
 
-    $_ = $env->Vars->{mycmd};
+    $_ = $cmd;
     if (! $_) {
-        $env->Vars->{mypage} = $frontpage;
-        $body = do_read($q, $db);
+        $body = do_read($q, $db,$frontpage);
     } elsif (/^read$/) {
-        $body = do_read($q, $db);
+        $body = do_read($q, $db, $mypage);
     } elsif (/^write$/) {
-        $body = do_write($q, $db);
+        $body = do_write($q, $db, $mypage);
     } elsif (/^edit$/) {
-        $body = do_edit($q, $db);
+        $body = do_edit($q, $db, $mypage);
     } elsif (/^index$/) {
         $body = do_index($q, $db);
     } else {
-        $env->Vars->{mypage} = $frontpage;
-        $body = do_read($q, $db);
+        $body = do_read($q, $db, $frontpage);
     }
     db_close($db);
     $status = 200;
@@ -63,8 +61,7 @@ my $app = sub {
     return [$status,$headers, $body];
 };
 
-my $q = CGI->new;
-handle_psgi($app, $q);
+handle_psgi($app, CGI->new);
 
 sub handle_psgi {
     my ($app, $q) = @_;
@@ -77,9 +74,10 @@ sub handle_psgi {
 sub do_read {
     my $q = shift;
     my $db = shift;
+    my $mypage = shift;
     return [
-        render_header($q->param("mypage"), 1),
-        render_content($db, $q->param("mypage")),
+        render_header($mypage, 1),
+        render_content($db, $mypage),
         render_footer(),
         ];
 }
@@ -87,22 +85,22 @@ sub do_read {
 sub do_edit {
     my $q = shift;
     my $db = shift;
-    my $mymsg = escape($db->{$q->param("mypage")});
+    my $mypage = shift;
+    my $mymsg = escape($db->{$mypage});
     $mymsg = "" unless defined $mymsg;
-    my $mypage = $q->param("mypage");
 
     my $form =  <<"EOD";
     <form action="." method="post">
         <input type="hidden" name="mycmd" value="write">
         <input type="hidden" name="mypage" value="$mypage">
         <input type="submit" value="$naviwrite"><br />
-        <textarea cols="$cols" rows="$rows" name="mymsg" wrap="off">$mymsg</textarea><br />
+        <textarea cols="80" rows="20" name="mymsg" wrap="off">$mymsg</textarea><br />
         <input type="submit" value="$naviwrite">
     </form>
 EOD
 
     return [
-        render_header($q->param("mypage"), 0),
+        render_header($mypage, 0),
         $form,
         render_footer()
         ];
@@ -130,17 +128,18 @@ sub do_index {
 sub do_write {
     my $q = shift;
     my $db = shift;
+    my $mypage = shift;
     if ($q->Vars->{mymsg}) {
-        $db->{$q->param("mypage")} = $q->Vars->{mymsg};
+        $db->{$mypage} = $q->Vars->{mymsg};
         return [
-            render_header($q->param("mypage"), 1),
-            render_content($db, $q->param("mypage")),
+            render_header($mypage, 1),
+            render_content($db, $mypage),
             render_footer(),
             ];
     } else {
-        delete $db->{$q->param("mypage")};
+        delete $db->{$mypage};
         return [
-            render_header($q->param("mypage") . $msgdeleted, 0),
+            render_header($mypage . $msgdeleted, 0),
             render_footer()
             ];
     }
@@ -159,11 +158,11 @@ sub do_error {
 }
 
 sub render_header {
-    my ($title, $canedit) = @_;
+    my ($mypage, $canedit) = @_;
     my $params = {
-        title => $title,
+        title => $mypage,
         frontpage => $frontpage,
-        mypage => $q->param("mypage") || "",
+        mypage => $mypage  || "",
         naviedit => $naviedit,
         naviindex => $naviindex,
         canedit => $canedit,
