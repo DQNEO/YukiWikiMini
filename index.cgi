@@ -21,9 +21,7 @@ my %form;
 my %database;
 my $q = CGI->new;
 
-my $psgi_ret = main($q);
-
-handle_psgi_ret(@$psgi_ret);
+handle_psgi_ret(@{main($q)});
 
 sub handle_psgi_ret {
     my ($status,$headers,$body) = @_;
