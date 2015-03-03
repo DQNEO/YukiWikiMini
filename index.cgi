@@ -18,10 +18,8 @@ my $rows = 20;
 
 my %form;
 my %database;
-my $q = CGI->new;
-
 my $app = sub {
-    my $env = shift;
+    my $env = my $q = shift;
     my $body;
 
     my $status;
@@ -65,6 +63,7 @@ my $app = sub {
     return [$status,$headers, $body];
 };
 
+my $q = CGI->new;
 handle_psgi($app, $q);
 
 sub handle_psgi {
