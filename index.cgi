@@ -12,6 +12,8 @@ my $naviwrite = 'Write';
 my $naviedit = 'Edit';
 my $naviindex = 'Index';
 
+
+
 my $app = sub {
     my $env = my $q = shift;
 
@@ -40,16 +42,15 @@ my $app = sub {
         return [$status,$headers, $body];
     }
 
-    $_ = $cmd;
-    if (! $_) {
-        $body = do_read($q, $db,$frontpage);
-    } elsif (/^read$/) {
+    if (! $cmd) {
+        $body = do_read($q, $db, $frontpage);
+    } elsif ($cmd eq "read") {
         $body = do_read($q, $db, $mypage);
-    } elsif (/^write$/) {
+    } elsif ($cmd eq "write") {
         $body = do_write($q, $db, $mypage);
-    } elsif (/^edit$/) {
+    } elsif ($cmd eq "edit") {
         $body = do_edit($q, $db, $mypage);
-    } elsif (/^index$/) {
+    } elsif ($cmd eq "index") {
         $body = do_index($q, $db);
     } else {
         $body = do_read($q, $db, $frontpage);
