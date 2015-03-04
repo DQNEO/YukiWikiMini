@@ -11,7 +11,6 @@ my $editchar = '?';
 my $naviwrite = 'Write';
 my $naviedit = 'Edit';
 my $naviindex = 'Index';
-my $msgdeleted = ' is deleted.';
 
 my $app = sub {
     my $env = my $q = shift;
@@ -139,7 +138,7 @@ sub do_write {
     } else {
         delete $db->{$mypage};
         return [
-            render_header($mypage . $msgdeleted, 0),
+            render_header($mypage . ' is deleted.', 0),
             render_footer()
             ];
     }
