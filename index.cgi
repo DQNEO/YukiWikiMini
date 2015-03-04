@@ -5,13 +5,13 @@ use CGI;
 
 our $VERSION = "1.2.1";
 
-my $frontpage = 'FrontPage';
+my $config = { frontpage => 'FrontPage'};
+
 my $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
 my $editchar = '?';
 my $naviwrite = 'Write';
 my $naviedit = 'Edit';
 my $naviindex = 'Index';
-
 
 
 my $app = sub {
@@ -43,7 +43,7 @@ my $app = sub {
     }
 
     if (! $cmd) {
-        $body = do_read($q, $db, $frontpage);
+        $body = do_read($q, $db, $config->{frontpage});
     } elsif ($cmd eq "read") {
         $body = do_read($q, $db, $mypage);
     } elsif ($cmd eq "write") {
@@ -53,7 +53,7 @@ my $app = sub {
     } elsif ($cmd eq "index") {
         $body = do_index($q, $db);
     } else {
-        $body = do_read($q, $db, $frontpage);
+        $body = do_read($q, $db, $config->{frontpage});
     }
     db_close($db);
     $status = 200;
@@ -161,7 +161,7 @@ sub render_header {
     my ($mypage, $canedit) = @_;
     my $params = {
         title => $mypage,
-        frontpage => $frontpage,
+        frontpage => $config->{frontpage},
         mypage => $mypage  || "",
         naviedit => $naviedit,
         naviindex => $naviindex,
