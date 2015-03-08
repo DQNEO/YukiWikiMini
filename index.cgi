@@ -8,8 +8,6 @@ our $VERSION = "1.2.1";
 my $config = { frontpage => 'FrontPage'};
 
 my $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
-my $naviindex = 'Index';
-
 
 my $app = sub {
     my $env = my $q = shift;
@@ -160,7 +158,6 @@ sub render_header {
         title => $mypage,
         frontpage => $config->{frontpage},
         mypage => $mypage  || "",
-        naviindex => $naviindex,
         canedit => $canedit,
     };
 
@@ -188,7 +185,7 @@ sub render_header {
                 <td align="right">
                     <a href="?$params->{frontpage}">$params->{frontpage}</a> | 
                     @{[$params->{canedit} ? qq(<a href="?mycmd=edit&mypage=$params->{mypage}">Edit</a> | ) : '' ]}
-                    <a href="?mycmd=index">$params->{naviindex}</a> | 
+                    <a href="?mycmd=index">Index</a> | 
                     <a href="http://www.hyuki.com/yukiwiki/mini/">YukiWikiMini</a>
                 </td>
             </tr>
