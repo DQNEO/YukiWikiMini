@@ -10,7 +10,8 @@ my $config = { frontpage => 'FrontPage'};
 our $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
 
 my $app = sub {
-    my $env = my $q = shift;
+    my $env = shift;
+    my $req = $env;
 
     my $db = {};
     my $body;
@@ -18,8 +19,8 @@ my $app = sub {
     my $status;
     my $headers = ["Content-type" => "text/html; charset=utf-8"];
 
-    my $cmd = $env->param("mycmd");
-    my $mypage = $q->param("mypage");
+    my $cmd = $req->param("mycmd");
+    my $mypage = $req->param("mypage");
     if (defined($mypage) and $mypage !~ /^$WikiName$/) {
         $status = 200;
         $body = do_error("(invalid mypage)");
@@ -38,17 +39,17 @@ my $app = sub {
     }
 
     if (! $cmd) {
-        $body = do_read($q, $db, $config->{frontpage});
+        $body = do_read($req, $db, $config->{frontpage});
     } elsif ($cmd eq "read") {
-        $body = do_read($q, $db, $mypage);
+        $body = do_read($req, $db, $mypage);
     } elsif ($cmd eq "write") {
-        $body = do_write($q, $db, $mypage);
+        $body = do_write($req, $db, $mypage);
     } elsif ($cmd eq "edit") {
-        $body = do_edit($q, $db, $mypage);
+        $body = do_edit($req, $db, $mypage);
     } elsif ($cmd eq "index") {
-        $body = do_index($q, $db);
+        $body = do_index($req, $db);
     } else {
-        $body = do_read($q, $db, $config->{frontpage});
+        $body = do_read($req, $db, $config->{frontpage});
     }
     db_close($db);
     $status = 200;
