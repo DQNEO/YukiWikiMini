@@ -10,7 +10,8 @@ my $config = { frontpage => 'FrontPage'};
 our $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
 
 my $app = sub {
-    my $env = my $q = shift;
+    my $env = shift;
+    my $q = $env;
 
     my $db = {};
     my $body;
