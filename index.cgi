@@ -2,8 +2,8 @@
 use strict;
 use warnings;
 use CGI;
+use YukiWikiMini;
 
-require YukiWikiMini;
 my $app = YukiWikiMini::to_app();
 
 my $cgi = CGI->new;
