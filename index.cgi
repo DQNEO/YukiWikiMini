@@ -238,7 +238,7 @@ sub make_link {
     my $editchar = '?';
 
     if (/^(http|https|ftp):/) {
-        return qq|<a href="$_">$_</a>|;
+        return sprintf('<a href="%s">%s</a>', $_, $_);
     } elsif (/^(mailto):(.*)/) {
         return qq|<a href="$_">$2</a>|;
     } elsif ($db->{$_}) {
