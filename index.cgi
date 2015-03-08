@@ -18,7 +18,7 @@ my $app = sub {
     my $status;
     my $headers = ["Content-type" => "text/html; charset=utf-8"];
 
-    my $cmd = $env->param("mycmd");
+    my $cmd = $q->param("mycmd");
     my $mypage = $q->param("mypage");
     if (defined($mypage) and $mypage !~ /^$WikiName$/) {
         $status = 200;
