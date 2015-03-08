@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use CGI;
 
-my $app = require 'app.psgi';
+my $app = require 'YukiWikiMini.pm';
 
 my $cgi = CGI->new;
 $cgi->{QUERY_STRING} = $ENV{QUERY_STRING};
