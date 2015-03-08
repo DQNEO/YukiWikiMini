@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use CGI;
 
-require 'YukiWikiMini.pm';
+require YukiWikiMini;
 my $app = YukiWikiMini::to_app();
 
 my $cgi = CGI->new;
