@@ -183,9 +183,9 @@ sub render_header {
                     <h1>$params->{title}</h1>
                 </td>
                 <td align="right">
-                    <a href="?$params->{frontpage}">$params->{frontpage}</a> | 
+                    <a href="?$params->{frontpage}">$params->{frontpage}</a> |
                     @{[$params->{canedit} ? qq(<a href="?mycmd=edit&mypage=$params->{mypage}">Edit</a> | ) : '' ]}
-                    <a href="?mycmd=index">Index</a> | 
+                    <a href="?mycmd=index">Index</a> |
                     <a href="http://www.hyuki.com/yukiwiki/mini/">YukiWikiMini</a>
                 </td>
             </tr>
