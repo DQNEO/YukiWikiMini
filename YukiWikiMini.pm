@@ -9,8 +9,7 @@ my $config = { frontpage => 'FrontPage'};
 our $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
 
 my $app = sub {
-    my $env = shift;
-    my $req = $env;
+    my $req = shift;
 
     my $db = {};
     my $body;
