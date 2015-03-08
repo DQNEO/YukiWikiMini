@@ -5,13 +5,9 @@ use CGI;
 
 our $VERSION = "1.2.1";
 
-my $frontpage = 'FrontPage';
-my $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
-my $editchar = '?';
-my $naviwrite = 'Write';
-my $naviedit = 'Edit';
-my $naviindex = 'Index';
-my $msgdeleted = ' is deleted.';
+my $config = { frontpage => 'FrontPage'};
+
+our $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
 
 my $app = sub {
     my $env = my $q = shift;
@@ -41,19 +37,18 @@ my $app = sub {
         return [$status,$headers, $body];
     }
 
-    $_ = $cmd;
-    if (! $_) {
-        $body = do_read($q, $db,$frontpage);
-    } elsif (/^read$/) {
+    if (! $cmd) {
+        $body = do_read($q, $db, $config->{frontpage});
+    } elsif ($cmd eq "read") {
         $body = do_read($q, $db, $mypage);
-    } elsif (/^write$/) {
+    } elsif ($cmd eq "write") {
         $body = do_write($q, $db, $mypage);
-    } elsif (/^edit$/) {
+    } elsif ($cmd eq "edit") {
         $body = do_edit($q, $db, $mypage);
-    } elsif (/^index$/) {
+    } elsif ($cmd eq "index") {
         $body = do_index($q, $db);
     } else {
-        $body = do_read($q, $db, $frontpage);
+        $body = do_read($q, $db, $config->{frontpage});
     }
     db_close($db);
     $status = 200;
@@ -93,9 +88,9 @@ sub do_edit {
     <form action="." method="post">
         <input type="hidden" name="mycmd" value="write">
         <input type="hidden" name="mypage" value="$mypage">
-        <input type="submit" value="$naviwrite"><br />
+        <input type="submit" value="Write"><br />
         <textarea cols="80" rows="20" name="mymsg" wrap="off">$mymsg</textarea><br />
-        <input type="submit" value="$naviwrite">
+        <input type="submit" value="Write">
     </form>
 EOD
 
@@ -139,7 +134,7 @@ sub do_write {
     } else {
         delete $db->{$mypage};
         return [
-            render_header($mypage . $msgdeleted, 0),
+            render_header($mypage . ' is deleted.', 0),
             render_footer()
             ];
     }
@@ -161,10 +156,8 @@ sub render_header {
     my ($mypage, $canedit) = @_;
     my $params = {
         title => $mypage,
-        frontpage => $frontpage,
+        frontpage => $config->{frontpage},
         mypage => $mypage  || "",
-        naviedit => $naviedit,
-        naviindex => $naviindex,
         canedit => $canedit,
     };
 
@@ -190,9 +183,9 @@ sub render_header {
                     <h1>$params->{title}</h1>
                 </td>
                 <td align="right">
-                    <a href="?$params->{frontpage}">$params->{frontpage}</a> | 
-                    @{[$params->{canedit} ? qq(<a href="?mycmd=edit&mypage=$params->{mypage}">$params->{naviedit}</a> | ) : '' ]}
-                    <a href="?mycmd=index">$params->{naviindex}</a> | 
+                    <a href="?$params->{frontpage}">$params->{frontpage}</a> |
+                    @{[$params->{canedit} ? qq(<a href="?mycmd=edit&mypage=$params->{mypage}">Edit</a> | ) : '' ]}
+                    <a href="?mycmd=index">Index</a> |
                     <a href="http://www.hyuki.com/yukiwiki/mini/">YukiWikiMini</a>
                 </td>
             </tr>
@@ -233,16 +226,20 @@ sub render_content {
 }
 
 sub make_link {
-    $_ = shift;
+    my $word = shift;
     my $db = shift;
-    if (/^(http|https|ftp):/) {
-        return qq|<a href="$_">$_</a>|;
-    } elsif (/^(mailto):(.*)/) {
-        return qq|<a href="$_">$2</a>|;
-    } elsif ($db->{$_}) {
-        return qq|<a href="?$_">$_</a>|;
+
+    my $editchar = '?';
+
+    if ($word =~ /^(http|https|ftp):/) {
+        return sprintf('<a href="%s">%s</a>', $word, $word);
+    } elsif ($word =~ /^(mailto):(.*)/) {
+        return sprintf('<a href="%s">%s</a>', $word, $2);
+    } elsif ($db->{$word}) {
+        return sprintf('<a href="?%s">%s</a>', $word, $word);
     } else {
-        return qq|$_<a href="?mycmd=edit&mypage=$_">$editchar</a>|;
+        return sprintf('%s<a href="?mycmd=edit&mypage=%s">%s</a>',
+                       $word, $word, $editchar);
     }
 }
 
