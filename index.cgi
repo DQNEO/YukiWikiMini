@@ -240,11 +240,12 @@ sub make_link {
     if (/^(http|https|ftp):/) {
         return sprintf('<a href="%s">%s</a>', $_, $_);
     } elsif (/^(mailto):(.*)/) {
-        return qq|<a href="$_">$2</a>|;
+        return sprintf('<a href="%s">%s</a>', $_, $2);
     } elsif ($db->{$_}) {
-        return qq|<a href="?$_">$_</a>|;
+        return sprintf('<a href="?%s">%s</a>', $_, $_);
     } else {
-        return qq|$_<a href="?mycmd=edit&mypage=$_">$editchar</a>|;
+        return sprintf('%s<a href="?mycmd=edit&mypage=%s">%s</a>',
+                       $_, $_, $editchar);
     }
 }
 
