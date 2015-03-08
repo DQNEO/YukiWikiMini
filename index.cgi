@@ -7,7 +7,7 @@ our $VERSION = "1.2.1";
 
 my $config = { frontpage => 'FrontPage'};
 
-my $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
+our $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
 
 my $app = sub {
     my $env = my $q = shift;
