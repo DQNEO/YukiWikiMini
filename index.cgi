@@ -8,7 +8,6 @@ our $VERSION = "1.2.1";
 my $config = { frontpage => 'FrontPage'};
 
 my $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
-my $editchar = '?';
 my $naviwrite = 'Write';
 my $naviedit = 'Edit';
 my $naviindex = 'Index';
@@ -235,6 +234,9 @@ sub render_content {
 sub make_link {
     $_ = shift;
     my $db = shift;
+
+    my $editchar = '?';
+
     if (/^(http|https|ftp):/) {
         return qq|<a href="$_">$_</a>|;
     } elsif (/^(mailto):(.*)/) {
