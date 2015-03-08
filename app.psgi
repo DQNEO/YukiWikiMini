@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-use CGI;
 
 our $VERSION = "1.2.1";
 
