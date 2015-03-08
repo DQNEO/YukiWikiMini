@@ -1,4 +1,3 @@
-#!/usr/bin/env perl
 use strict;
 use warnings;
 use CGI;
@@ -254,3 +253,5 @@ sub db_close {
     my $db = shift;
     dbmclose(%$db);
 }
+
+1;
