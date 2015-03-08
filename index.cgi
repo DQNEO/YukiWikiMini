@@ -232,20 +232,20 @@ sub render_content {
 }
 
 sub make_link {
-    $_ = shift;
+    my $word = shift;
     my $db = shift;
 
     my $editchar = '?';
 
-    if (/^(http|https|ftp):/) {
-        return sprintf('<a href="%s">%s</a>', $_, $_);
-    } elsif (/^(mailto):(.*)/) {
-        return sprintf('<a href="%s">%s</a>', $_, $2);
-    } elsif ($db->{$_}) {
-        return sprintf('<a href="?%s">%s</a>', $_, $_);
+    if ($word =~ /^(http|https|ftp):/) {
+        return sprintf('<a href="%s">%s</a>', $word, $word);
+    } elsif ($word =~ /^(mailto):(.*)/) {
+        return sprintf('<a href="%s">%s</a>', $word, $2);
+    } elsif ($db->{$word}) {
+        return sprintf('<a href="?%s">%s</a>', $word, $word);
     } else {
         return sprintf('%s<a href="?mycmd=edit&mypage=%s">%s</a>',
-                       $_, $_, $editchar);
+                       $word, $word, $editchar);
     }
 }
 
