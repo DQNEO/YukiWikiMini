@@ -8,7 +8,6 @@ our $VERSION = "1.2.1";
 my $config = { frontpage => 'FrontPage'};
 
 my $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
-my $naviedit = 'Edit';
 my $naviindex = 'Index';
 
 
@@ -161,7 +160,6 @@ sub render_header {
         title => $mypage,
         frontpage => $config->{frontpage},
         mypage => $mypage  || "",
-        naviedit => $naviedit,
         naviindex => $naviindex,
         canedit => $canedit,
     };
@@ -189,7 +187,7 @@ sub render_header {
                 </td>
                 <td align="right">
                     <a href="?$params->{frontpage}">$params->{frontpage}</a> | 
-                    @{[$params->{canedit} ? qq(<a href="?mycmd=edit&mypage=$params->{mypage}">$params->{naviedit}</a> | ) : '' ]}
+                    @{[$params->{canedit} ? qq(<a href="?mycmd=edit&mypage=$params->{mypage}">Edit</a> | ) : '' ]}
                     <a href="?mycmd=index">$params->{naviindex}</a> | 
                     <a href="http://www.hyuki.com/yukiwiki/mini/">YukiWikiMini</a>
                 </td>
