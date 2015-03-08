@@ -56,17 +56,7 @@ my $app = sub {
     return [$status,$headers, $body];
 };
 
-my $cgi = CGI->new;
-$cgi->{QUERY_STRING} = $ENV{QUERY_STRING};
-handle_psgi($app, $cgi);
-
-sub handle_psgi {
-    my ($app, $q) = @_;
-    my ($status,$headers,$body) = @{$app->($q)};
-    print $headers->[0], ":" , $headers->[1] , "\n";
-    print "\n";
-    print $_ for @$body;
-}
+return $app;
 
 sub do_read {
     my $q = shift;
