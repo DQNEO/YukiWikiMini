@@ -25,7 +25,7 @@ my $app = sub {
         return [$status,$headers, $body];
     }
 
-    if ($req->{QUERY_STRING} =~ /^($WikiName)$/) {
+    if (defined $req->{QUERY_STRING} && $req->{QUERY_STRING} =~ /^($WikiName)$/) {
         $cmd = 'read';
         $mypage = $1;
     }
