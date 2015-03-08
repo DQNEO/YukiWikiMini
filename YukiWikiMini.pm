@@ -1,3 +1,4 @@
+package YukiWikiMini;
 use strict;
 use warnings;
 
