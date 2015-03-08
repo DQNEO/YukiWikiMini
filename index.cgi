@@ -3,7 +3,8 @@ use strict;
 use warnings;
 use CGI;
 
-my $app = require 'YukiWikiMini.pm';
+require 'YukiWikiMini.pm';
+my $app = YukiWikiMini::to_app();
 
 my $cgi = CGI->new;
 $cgi->{QUERY_STRING} = $ENV{QUERY_STRING};

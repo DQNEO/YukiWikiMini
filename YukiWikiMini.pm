@@ -56,7 +56,9 @@ my $app = sub {
     return [$status,$headers, $body];
 };
 
-return $app;
+sub to_app {
+    return $app;
+}
 
 sub do_read {
     my $q = shift;
