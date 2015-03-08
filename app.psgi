@@ -26,7 +26,7 @@ my $app = sub {
         return [$status,$headers, $body];
     }
 
-    if ($ENV{QUERY_STRING} =~ /^($WikiName)$/) {
+    if ($req->{QUERY_STRING} =~ /^($WikiName)$/) {
         $cmd = 'read';
         $mypage = $1;
     }
@@ -56,7 +56,9 @@ my $app = sub {
     return [$status,$headers, $body];
 };
 
-handle_psgi($app, CGI->new);
+my $cgi = CGI->new;
+$cgi->{QUERY_STRING} = $ENV{QUERY_STRING};
+handle_psgi($app, $cgi);
 
 sub handle_psgi {
     my ($app, $q) = @_;
