@@ -8,7 +8,6 @@ our $VERSION = "1.2.1";
 my $config = { frontpage => 'FrontPage'};
 
 my $WikiName = '([A-Z][a-z]+([A-Z][a-z]+)+)';
-my $naviwrite = 'Write';
 my $naviedit = 'Edit';
 my $naviindex = 'Index';
 
@@ -92,9 +91,9 @@ sub do_edit {
     <form action="." method="post">
         <input type="hidden" name="mycmd" value="write">
         <input type="hidden" name="mypage" value="$mypage">
-        <input type="submit" value="$naviwrite"><br />
+        <input type="submit" value="Write"><br />
         <textarea cols="80" rows="20" name="mymsg" wrap="off">$mymsg</textarea><br />
-        <input type="submit" value="$naviwrite">
+        <input type="submit" value="Write">
     </form>
 EOD
 
