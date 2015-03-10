@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-use YukiWikiMini;
+use App::YukiWikiMini;
 use Plack::Request;
 
-my $app = YukiWikiMini::to_app();
+my $app = App::YukiWikiMini::to_app();
 
 my $wrapper = sub {
     my $env = shift;

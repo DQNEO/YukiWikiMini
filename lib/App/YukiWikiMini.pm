@@ -1,8 +1,8 @@
-package YukiWikiMini;
+package App::YukiWikiMini;
 use strict;
 use warnings;
 
-our $VERSION = "1.3.1";
+our $VERSION = "1.3.2";
 
 my $config = { frontpage => 'FrontPage'};
 
