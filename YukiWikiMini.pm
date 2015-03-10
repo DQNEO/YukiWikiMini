@@ -238,7 +238,7 @@ sub make_link {
 
 sub db_open {
     my $db = shift;
-    my $dbname = 'ykwkmini';
+    my $dbname = 'pages';
     dbmopen(%$db, $dbname, 0666);
 }
 
