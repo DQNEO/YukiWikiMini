@@ -2,7 +2,7 @@ package YukiWikiMini;
 use strict;
 use warnings;
 
-our $VERSION = "1.2.1";
+our $VERSION = "1.3.1";
 
 my $config = { frontpage => 'FrontPage'};
 
