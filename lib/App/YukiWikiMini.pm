@@ -1,4 +1,4 @@
-package YukiWikiMini;
+package App::YukiWikiMini;
 use strict;
 use warnings;
 

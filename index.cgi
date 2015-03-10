@@ -2,9 +2,10 @@
 use strict;
 use warnings;
 use CGI;
-use YukiWikiMini;
+use lib 'lib';
+use App::YukiWikiMini;
 
-my $app = YukiWikiMini::to_app();
+my $app = App::YukiWikiMini::to_app();
 
 my $cgi = CGI->new;
 $cgi->{QUERY_STRING} = $ENV{QUERY_STRING};
